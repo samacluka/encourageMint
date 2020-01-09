@@ -56,6 +56,12 @@ callbacks.auth.google.success = function(req,res){
   res.redirect("/");
 };
 
+// ======================================== INDEX ========================================
+// GET
+callbacks.index.get.index = function(req,res){
+  res.render(views.index.home);
+}
+
 // ======================================== CONTROLLER ========================================
 // GET
 callbacks.controller.get.setpoints = function(req,res){
