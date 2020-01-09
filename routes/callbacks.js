@@ -4,6 +4,8 @@ const passport        = require("passport");
 
 const User            = require(rootDir+"models/user.js");
 
+const views           = require(rootDir+"views/views.js");
+
 var callbacks = {
   auth: {
     // logout
@@ -57,12 +59,12 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== CONTROLLER ========================================
 // GET
 callbacks.controller.get.setpoints = function(req,res){
-  res.send("setpoints");
+  res.render(views.controller.getSetpoints);
 }
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
-  res.send("logs");
+  res.render(views.controller.setLogs);
 }
 
 // ======================================== EXPORT ========================================
