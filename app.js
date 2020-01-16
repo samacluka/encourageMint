@@ -17,7 +17,7 @@ const Plant    = require("./models/plant.js"),
 mongoose.connect(process.env.DATABASEURL, { useNewUrlParser:  true,
                                             useCreateIndex:   true,
                                             useFindAndModify: false,
-                                            useUnifiedTopology: true });
+                                            useUnifiedTopology: true }, () => { console.log("DB Connected")}).catch((err) => console.log(err));
 
 /* Configure Other packages */
 app.use(bodyParser.urlencoded({extended: true}));
@@ -56,6 +56,6 @@ app.use("/auth",authRoutes);
 /*=================================INIT - END=================================*/
 /*=================================LISTEN - BEGIN=============================*/
 app.listen(process.env.PORT, function(){
-  console.log("compliMINT! encourageMINT");
+  console.log("Server Started");
 });
 /*=================================LISTEN - END===============================*/
