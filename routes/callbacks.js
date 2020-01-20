@@ -66,8 +66,8 @@ callbacks.index.get.index = function(req,res){
 callbacks.controller.get.setpoints = function(req,res){
   // Read setpoints from data base given query params (req.body)
   // Return query results
-  console.log("route reached "+req.params.id); // Query NOT WORKING
-  Plant.findById(req.params.id, (err, foundPlant) => {
+  console.log("route reached "+req.body.plantid); // Query NOT WORKING
+  Plant.findById(req.body.plantid, (err, foundPlant) => {
     if(err || !foundPlant){
       console.log(err);
     } else {
