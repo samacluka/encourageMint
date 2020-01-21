@@ -3,7 +3,8 @@ const rootDir = "../";
 const passport        = require("passport");
 
 const User            = require(rootDir+"models/user.js"),
-      Plant           = require(rootDir+"models/plant.js");
+      Plant           = require(rootDir+"models/plant.js"),
+      Log             = require(rootDir+"models/log.js");
 
 const views           = require(rootDir+"views/views.js");
 
@@ -66,12 +67,10 @@ callbacks.index.get.index = function(req,res){
 callbacks.controller.get.setpoints = function(req,res){
   // Read setpoints from data base given query params (req.body)
   // Return query results
-  console.log("route reached "+req.body.plantid); // Query NOT WORKING
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     if(err || !foundPlant){
-      console.log(err);
+      console.log("err: "+err);
     } else {
-      console.log("plant found "+foundPlant);
       res.send(JSON.stringify(foundPlant));
     }
   });
@@ -80,7 +79,38 @@ callbacks.controller.get.setpoints = function(req,res){
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
-  res.render(views.controller.setLogs);
+  var logObj = {
+    temperature: req.body.temperature,
+    humidity: req.body.humidity,
+    soilMoisture: req.body.soilMoisture,
+    light: req.body.light,
+    pumpTime: req.body.pumpTime
+  };
+  Log.countDocuments({}, (err, count) => {
+    if(count >= 5){
+      Log.deleteOne({}, (err) => {
+        if(err){
+          console.log(err);
+        } else {
+          Log.create(logObj,(err, newLog) => {
+            if(err){
+              console.log(err);
+            } else {
+              res.send("successfully logged");
+            }
+          });
+        }
+      });
+    } else {
+      Log.create(logObj,(err, newLog) => {
+        if(err){
+          console.log(err);
+        } else {
+          res.send("successfully logged");
+        }
+      });
+    }
+  });
 };
 
 // ======================================== EXPORT ========================================
