@@ -59,7 +59,9 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== INDEX ========================================
 // GET
 callbacks.index.get.index = function(req,res){
-  Log.find({}, (err, logs) => {
+  var time = new Date();
+  time.setDate(time.getDate()-7)%30;
+  Log.findOne({}, (err, logs) => {   /// FIND ONE FOR NOW ---> created: {$lt: time}
     if(err){
       console.log(err);
     } else {
@@ -85,29 +87,36 @@ callbacks.controller.get.setpoints = function(req,res){
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
-  var logObj = {
-    temperature: req.body.temperature,
-    humidity: req.body.humidity,
-    soilMoisture: req.body.soilMoisture,
-    light: req.body.light,
-    pumpTime: req.body.pumpTime
-  };
-
-  var time = new Date();
-  time.setDate(time.getDate()-7)%30;
-  Log.deleteMany({created: {$lt: time}}, (err) => {
-    if(err){
-      console.log(err);
-    } else {
-      Log.create(logObj,(err, newLog) => {
-        if(err){
-          console.log(err);
-        } else {
-          res.send("successfully logged");
-        }
-      });
+  try {
+    var logObj = {
+      temperature: req.body.temperature,
+      humidity: req.body.humidity,
+      soilMoisture: req.body.soilMoisture,
+      light: req.body.light,
+      pumpTime: req.body.pumpTime
     }
-  });
+
+  } catch (e) {
+    res.send(e);
+
+  } finally {
+    var time = new Date();
+    time.setDate(time.getDate()-7)%30;
+    Log.deleteMany({created: {$lt: time}}, (err) => {
+      if(err){
+        console.log(err);
+      } else {
+        Log.create(logObj,(err, newLog) => {
+          if(err){
+            console.log(err);
+          } else {
+            res.send("successfully logged");
+          }
+        });
+      }
+    });
+
+  }
 };
 
 // ======================================== EXPORT ========================================

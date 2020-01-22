@@ -12,6 +12,8 @@
     <% } else { %>
         <p>Signed in as <%= currentUser.firstName + " " + currentUser.lastName %></p>
         <a href="/auth/logout">Sign out</a>
+        <br>
+        <p><%= logs %></p>
     <% } %>
 
   </body>
