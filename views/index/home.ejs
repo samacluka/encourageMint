@@ -5,13 +5,13 @@
     <title>Home</title>
   </head>
   <body>
-    <p>Home</p>
-    <a class="" href="/auth/google">Sign in with Google</a>
+    <h1>HOME</h1>
 
     <% if(!currentUser){ %>
-      <p>Not signed in</p>
+        <a class="" href="/auth/google">Sign in with Google</a>
     <% } else { %>
         <p>Signed in as <%= currentUser.firstName + " " + currentUser.lastName %></p>
+        <a href="/auth/logout">Sign out</a>
     <% } %>
 
   </body>

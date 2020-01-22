@@ -92,21 +92,12 @@ callbacks.controller.put.logs = function(req,res){
     light: req.body.light,
     pumpTime: req.body.pumpTime
   };
-  Log.countDocuments({}, (err, count) => {
-    if(count >= 5){
-      Log.deleteOne({}, (err) => { // Deletes oldest document (1)
-        if(err){
-          console.log(err);
-        } else {
-          Log.create(logObj,(err, newLog) => {
-            if(err){
-              console.log(err);
-            } else {
-              res.send("successfully logged");
-            }
-          });
-        }
-      });
+
+  var time = new Date();
+  time.setDate(time.getDate()-7)%30;
+  Log.deleteMany({created: {$lt: time}}, (err) => {
+    if(err){
+      console.log(err);
     } else {
       Log.create(logObj,(err, newLog) => {
         if(err){
