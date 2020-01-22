@@ -59,7 +59,13 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== INDEX ========================================
 // GET
 callbacks.index.get.index = function(req,res){
-  res.render(views.index.home);
+  Log.find({}, (err, logs) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render(views.index.home, {logs: logs});
+    }
+  });
 };
 
 // ======================================== CONTROLLER ========================================
@@ -88,7 +94,7 @@ callbacks.controller.put.logs = function(req,res){
   };
   Log.countDocuments({}, (err, count) => {
     if(count >= 5){
-      Log.deleteOne({}, (err) => {
+      Log.deleteOne({}, (err) => { // Deletes oldest document (1)
         if(err){
           console.log(err);
         } else {
