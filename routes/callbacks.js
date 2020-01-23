@@ -61,7 +61,7 @@ callbacks.auth.google.success = function(req,res){
 callbacks.index.get.index = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
-  Log.findOne({}, (err, logs) => {   /// FIND ONE FOR NOW ---> created: {$lt: time}
+  Log.find({created: {$gt: time}}).limit(10).exec((err, logs) => {
     if(err){
       console.log(err);
     } else {
@@ -89,6 +89,7 @@ callbacks.controller.get.setpoints = function(req,res){
 callbacks.controller.put.logs = function(req,res){
   try {
     var logObj = {
+      plant: req.body.plantid,
       temperature: req.body.temperature,
       humidity: req.body.humidity,
       soilMoisture: req.body.soilMoisture,
