@@ -61,7 +61,10 @@ callbacks.auth.google.success = function(req,res){
 callbacks.index.get.index = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
-  Log.find({created: {$gt: time}}).limit(10).exec((err, logs) => {
+
+  var query = {created: {$gt: time}}; // Making room for the query to be built up
+
+  Log.find(query).limit(10).exec((err, logs) => {
     if(err){
       console.log(err);
     } else {
