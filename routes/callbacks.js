@@ -62,6 +62,7 @@ callbacks.index.get.index = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
 
+  // Find anything younger than one week
   var query = {created: {$gt: time}}; // Making room for the query to be built up
 
   Log.find(query).limit(10).exec((err, logs) => {
@@ -85,7 +86,6 @@ callbacks.controller.get.setpoints = function(req,res){
       res.send(JSON.stringify(foundPlant));
     }
   });
-  // res.render(views.controller.getSetpoints);
 };
 
 // PUT
@@ -105,7 +105,8 @@ callbacks.controller.put.logs = function(req,res){
 
   } finally {
     var time = new Date();
-    time.setDate(time.getDate()-7)%30;
+    time.setDate(time.getDate()-7)%30; // One week ago
+    //Delete any logs older than a week
     Log.deleteMany({created: {$lt: time}}, (err) => {
       if(err){
         console.log(err);
