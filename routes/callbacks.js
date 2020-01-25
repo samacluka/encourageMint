@@ -58,7 +58,7 @@ callbacks.auth.google.success = function(req,res){
 
 // ======================================== INDEX ========================================
 // GET
-callbacks.index.get.index = function(req,res){
+callbacks.index.get.home = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
 
@@ -72,6 +72,10 @@ callbacks.index.get.index = function(req,res){
       res.render(views.index.home, {logs: logs});
     }
   });
+};
+
+callbacks.index.get.index = function(req,res){
+  res.render(views.index.index);
 };
 
 // ======================================== CONTROLLER ========================================

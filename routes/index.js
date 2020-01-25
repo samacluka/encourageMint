@@ -4,6 +4,7 @@ const express = require("express"),
 const callbacks       = require("./callbacks.js");
 
 // GET
-router.get("/", callbacks.index.get.index);
+router.get("/", callbacks.index.get.home);
+router.get("/index", callbacks.index.get.index)
 
 module.exports = router;
