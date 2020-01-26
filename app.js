@@ -53,6 +53,8 @@ app.use("/", indexRoutes);
 app.use("/controller",controllerRoutes);
 app.use("/auth",authRoutes);
 
+app.use(express.static('public'));
+
 /*=================================INIT - END=================================*/
 /*=================================LISTEN - BEGIN=============================*/
 app.listen(process.env.PORT, function(){

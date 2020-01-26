@@ -7,7 +7,7 @@
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
         crossorigin="anonymous">
-    <link href="app.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
     
 </head>
 <body>
@@ -24,6 +24,7 @@
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
+                        <!-- TODO: Link each tab to a new graph-->
                         <li class=nav-item>
                             <a class="nav-link-active" href="#">
                                 Lorem
@@ -41,7 +42,8 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1>Dashboard</h1>
                 </div>
-                <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+                <canvas class="my-4 w-100 myChart" width="900" height="380"></canvas><br>
+                <canvas class="my-4 w-100 myChart" width="900" height="380"></canvas>
             </div>
         </div>
     </div>
@@ -55,6 +57,6 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
-    <script src="chart.js"></script>
+    <script src="/js/chart.js"></script>
 </body>
 </html>
