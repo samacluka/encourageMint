@@ -83,6 +83,13 @@ callbacks.controller.get.setpoints = function(req,res){
     if(err || !foundPlant){
       console.log("err: "+err);
     } else {
+      console.log("Name: " + foundPlant.Name);
+      console.log("Type: " + foundPlant.Type);
+      console.log("Soil Moisture Min Threshold: " + foundPlant.soilMoisture.min);
+      console.log("Soil Moisture Max Threshold: " + foundPlant.soilMoisture.max);
+      console.log("Light Max Threshold: " + foundPlant.lightThreshold.min);
+      console.log("Light Min Threshold: " + foundPlant.lightThreshold.max);
+
       res.send(JSON.stringify(foundPlant));
     }
   });
@@ -99,6 +106,12 @@ callbacks.controller.put.logs = function(req,res){
       light: req.body.light,
       pumpTime: req.body.pumpTime
     }
+
+    console.log("Temperature: "+req.body.temperature);
+    console.log("Humidity: "+req.body.humidity);
+    console.log("soilMoisture: "+req.body.soilMoisture);
+    console.log("Light: "+req.body.light);
+    console.log("pumpTime: "+req.body.pumpTime);
 
   } catch (e) {
     res.send(e);
