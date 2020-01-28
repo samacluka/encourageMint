@@ -111,7 +111,7 @@ callbacks.controller.put.logs = function(req,res){
     console.log("Humidity: "+req.body.humidity);
     console.log("soilMoisture: "+req.body.soilMoisture);
     console.log("Light: "+req.body.light);
-    console.log("pumpTime: "+req.body.pumpTime);
+    console.log("Water Present: "+req.body.pumpTime);
 
   } catch (e) {
     res.send(e);
