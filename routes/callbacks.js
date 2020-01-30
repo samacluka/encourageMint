@@ -75,6 +75,10 @@ callbacks.index.get.home = function(req,res){
 };
 
 callbacks.index.get.index = function(req,res){
+  res.render(views.index.index);
+};
+
+callbacks.index.get.index_data = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
 
@@ -85,10 +89,10 @@ callbacks.index.get.index = function(req,res){
     if(err){
       console.log(err);
     } else {
-      res.render(views.index.index, {logs: logs});
+      res.send(logs);
     }
   });
-};
+}
 
 // ======================================== CONTROLLER ========================================
 // GET
