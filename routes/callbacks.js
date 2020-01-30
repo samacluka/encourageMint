@@ -58,7 +58,7 @@ callbacks.auth.google.success = function(req,res){
 
 // ======================================== INDEX ========================================
 // GET
-callbacks.index.get.index = function(req,res){
+callbacks.index.get.home = function(req,res){
   var time = new Date();
   time.setDate(time.getDate()-7)%30;
 
@@ -73,6 +73,26 @@ callbacks.index.get.index = function(req,res){
     }
   });
 };
+
+callbacks.index.get.index = function(req,res){
+  res.render(views.index.index);
+};
+
+callbacks.index.get.index_data = function(req,res){
+  var time = new Date();
+  time.setDate(time.getDate()-7)%30;
+
+  // Find anything younger than one week
+  var query = {created: {$gt: time}}; // Making room for the query to be built up
+
+  Log.find(query).limit(10).exec((err, logs) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.send(logs);
+    }
+  });
+}
 
 // ======================================== CONTROLLER ========================================
 // GET

@@ -4,7 +4,8 @@ const viewsDir = path.join(__dirname, "/");
 
 const views = {
     index: {
-      home: viewsDir + "index/home"
+      home: viewsDir + "index/home",
+      index: viewsDir + "index/index"
     }
 };
 
