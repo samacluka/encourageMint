@@ -12,10 +12,6 @@
     <% } else { %>
         <p>Signed in as <%= currentUser.firstName + " " + currentUser.lastName %></p>
         <a href="/auth/logout">Sign out</a>
-        <br>
-        <% logs.forEach((log) => { %>
-          <p><%= log %></p>
-        <% }) %>
     <% } %>
 
     <br>

@@ -59,19 +59,7 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== INDEX ========================================
 // GET
 callbacks.index.get.home = function(req,res){
-  var time = new Date();
-  time.setDate(time.getDate()-7)%30;
-
-  // Find anything younger than one week
-  var query = {created: {$gt: time}}; // Making room for the query to be built up
-
-  Log.find(query).limit(10).exec((err, logs) => {
-    if(err){
-      console.log(err);
-    } else {
-      res.render(views.index.home, {logs: logs});
-    }
-  });
+  res.render(views.index.home);
 };
 
 callbacks.index.get.index = function(req,res){
