@@ -9,10 +9,6 @@ const express         = require("express"),
       path            = require("path"),
       dotenv          = require("dotenv").config(); // Configure .env variables
 
-/* Create DB variables */
-const Plant    = require("./models/plant.js"),
-      User     = require("./models/user.js");
-
 /* Configure Database */
 mongoose.connect(process.env.DATABASEURL, { useNewUrlParser:  true,
                                             useCreateIndex:   true,
