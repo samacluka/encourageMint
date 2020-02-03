@@ -108,10 +108,6 @@ callbacks.controller.put.logs = function(req,res){
       pumpTime: req.body.pumpTime
     }
 
-  } catch (e) {
-    res.send(e);
-
-  } finally {
     var time = new Date();
     time.setDate(time.getDate()-7)%30; // One week ago
     //Delete any logs older than a week
@@ -129,6 +125,8 @@ callbacks.controller.put.logs = function(req,res){
       }
     });
 
+  } catch (e) {
+    res.send(e);
   }
 };
 

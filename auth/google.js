@@ -9,7 +9,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    User.findOne({ googleId: profile.id }, function (err, user) {
+    User.findOne({ googleId: profile.id }, (err, user) => {
       if(err){
         console.log(err);
         done(err, null);
