@@ -76,6 +76,7 @@ callbacks.index.get.index_data = function(req,res){
   Log.find(query).limit(10).exec((err, logs) => {
     if(err){
       console.log(err);
+      res.send(err);
     } else {
       res.send(logs);
     }
@@ -90,6 +91,7 @@ callbacks.controller.get.setpoints = function(req,res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     if(err || !foundPlant){
       console.log("err: "+err);
+      res.send("err: "+err);
     } else {
       res.send(JSON.stringify(foundPlant));
     }
@@ -114,10 +116,12 @@ callbacks.controller.put.logs = function(req,res){
     Log.deleteMany({created: {$lt: time}}, (err) => {
       if(err){
         console.log(err);
+        res.send(err);
       } else {
         Log.create(logObj,(err, newLog) => {
           if(err){
             console.log(err);
+            res.send(err);
           } else {
             res.send("successfully logged");
           }
