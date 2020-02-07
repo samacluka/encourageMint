@@ -6,8 +6,8 @@ const views = {
     index: {
       home: viewsDir + "index/home",
       index: viewsDir + "index/index",
-      newPlant: viewDir + "index/newPlant",
-      updatePlant: viewDir + "index/updatePlant",
+      newPlant: viewsDir + "index/newPlant",
+      updatePlant: viewsDir + "index/updatePlant",
     }
 };
 

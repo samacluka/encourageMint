@@ -23,6 +23,9 @@ var callbacks = {
       },
       post: {
         // register
+      },
+      put: {
+        
       }
   },
   controller: {
@@ -92,14 +95,21 @@ callbacks.index.get.updatePlant = function(req, res){
 }
 
 callbacks.index.post.newPlant = function(req, res){
-  Plant.create({Name: req.body.name,
-                Type: req.body.type,
-                Owner: req.user,
-                soilMoisture.min = req.body.soilMoistureMin,
-                soilMoisture.max = req.body.soilMoistureMax,
-                lightThreshold.min = req.body.lightThresholdMin,
-                lightThreshold.max = req.body.lightThresholdMax},
-        (err, newPlant) => {
+  var PlantObj = {
+      Name: req.body.name,
+      Type: req.body.type,
+      Owner: req.user,
+      soilMoisture: {
+        min: req.body.soilMoistureMin,
+        max: req.body.soilMoistureMax
+      },
+      lightThreshold: {
+        min: req.body.lightThresholdMin,
+        max: req.body.lightThresholdMax
+      }
+    };
+
+  Plant.create(PlantObj, (err, newPlant) => {
           if(err){
             console.log(err);
             res.send(err);
@@ -109,11 +119,11 @@ callbacks.index.post.newPlant = function(req, res){
         });
 }
 
-callback.index.put.updatePlant = function(req, res){
+callbacks.index.put.updatePlant = function(req, res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     foundPlant.Name = req.body.name;
-    foundPlant.Type: req.body.type;
-    foundPlant.Owner: req.user;
+    foundPlant.Type = req.body.type;
+    foundPlant.Owner = req.user;
     foundPlant.soilMoisture.min = req.body.soilMoistureMin;
     foundPlant.soilMoisture.max = req.body.soilMoistureMax;
     foundPlant.lightThreshold.min = req.body.lightThresholdMin;
