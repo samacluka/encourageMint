@@ -83,6 +83,49 @@ callbacks.index.get.index_data = function(req,res){
   });
 }
 
+callbacks.index.get.newPlant = function(req, res){
+  res.render(views.index.newPlant);
+}
+
+callbacks.index.get.updatePlant = function(req, res){
+  res.render(view.index.updatePlant);
+}
+
+callbacks.index.post.newPlant = function(req, res){
+  Plant.create({Name: req.body.name,
+                Type: req.body.type,
+                Owner: req.user,
+                soilMoisture.min = req.body.soilMoistureMin,
+                soilMoisture.max = req.body.soilMoistureMax,
+                lightThreshold.min = req.body.lightThresholdMin,
+                lightThreshold.max = req.body.lightThresholdMax},
+        (err, newPlant) => {
+          if(err){
+            console.log(err);
+            res.send(err);
+          } else {
+            res.render(views.index.index);
+          }
+        });
+}
+
+callback.index.put.updatePlant = function(req, res){
+  Plant.findById(req.body.plantid, (err, foundPlant) => {
+    foundPlant.Name = req.body.name;
+    foundPlant.Type: req.body.type;
+    foundPlant.Owner: req.user;
+    foundPlant.soilMoisture.min = req.body.soilMoistureMin;
+    foundPlant.soilMoisture.max = req.body.soilMoistureMax;
+    foundPlant.lightThreshold.min = req.body.lightThresholdMin;
+    foundPlant.lightThreshold.max = req.body.lightThresholdMax;
+
+    foundPlant.save().then((savedPlant) => {
+      console.log(savedPlant);
+      res.render(views.index.index);
+    }).catch((e) => {console.log(e);});
+  });
+}
+
 // ======================================== CONTROLLER ========================================
 // GET
 callbacks.controller.get.setpoints = function(req,res){
