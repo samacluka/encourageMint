@@ -146,6 +146,13 @@ callbacks.controller.get.setpoints = function(req,res){
       console.log("err: "+err);
       res.send("err: "+err);
     } else {
+      console.log("Name: " + foundPlant.Name);
+      console.log("Type: " + foundPlant.Type);
+      console.log("Soil Moisture Min Threshold: " + foundPlant.soilMoisture.min);
+      console.log("Soil Moisture Max Threshold: " + foundPlant.soilMoisture.max);
+      console.log("Light Max Threshold: " + foundPlant.lightThreshold.min);
+      console.log("Light Min Threshold: " + foundPlant.lightThreshold.max);
+
       res.send(JSON.stringify(foundPlant));
     }
   });
@@ -163,6 +170,10 @@ callbacks.controller.put.logs = function(req,res){
       pumpTime: req.body.pumpTime
     }
 
+  } catch (e) {
+    res.send(e);
+
+  } finally {
     var time = new Date();
     time.setDate(time.getDate()-7)%30; // One week ago
     //Delete any logs older than a week
