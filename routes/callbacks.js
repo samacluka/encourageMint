@@ -25,7 +25,7 @@ var callbacks = {
         // register
       },
       put: {
-        
+
       }
   },
   controller: {
@@ -77,9 +77,9 @@ callbacks.index.get.index_data = function(req,res){
   var query = {created: {$gt: time}}; // Making room for the query to be built up
 
   Log.find(query).limit(10).exec((err, logs) => {
-    if(err){
-      console.log(err);
-      res.send(err);
+    if(err || !logs){
+      console.log(err | "No Logs");
+      res.send(err | "No Logs");
     } else {
       res.send(logs);
     }

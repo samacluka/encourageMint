@@ -78,3 +78,40 @@ body {
   visibility: hidden;
   z-index: -1;
 }
+
+.chart-select-buttons{
+  margin: 1em;
+}
+
+.radio-label{
+  font-size: 1.5em;
+}
+
+span#temperature{
+  color: #ff0000;
+}
+
+span#humidity{
+  color: #1fc8de;
+}
+
+span#light{
+  color: #e3b92d;
+}
+
+span#soilMoisture{
+  color: #734500;
+}
+
+[name='chart-select']{
+  display: none;
+}
+
+a.nav-link p{
+  margin-bottom: 0px;
+  color: white;
+}
+
+a#userMsg.nav-link:hover{
+  cursor: default;
+}
