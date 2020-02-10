@@ -4,10 +4,13 @@
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
       <div class="chart-select-buttons">
-        <label><input type="radio" name="chart-select" value="temperature" checked="checked"><span class="radio-label" id="temperature"> Temperature</span></label><br>
-        <label><input type="radio" name="chart-select" value="humidity"><span class="radio-label" id="humidity"> Humidity</span></label><br>
-        <label><input type="radio" name="chart-select" value="light"><span class="radio-label" id="light"> Light</span></label><br>
-        <label><input type="radio" name="chart-select" value="soilMoisture"><span class="radio-label" id="soilMoisture"> Soil Moisture</span></label><br>
+        <a href="#labels" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Plant 1</a>
+        <ul class="list-unstyled collapse" id="labels">
+          <label><input type="radio" name="chart-select" value="temperature"><span class="radio-label" id="temperature"> Temperature</span></label><br>
+          <label><input type="radio" name="chart-select" value="humidity"><span class="radio-label" id="humidity"> Humidity</span></label><br>
+          <label><input type="radio" name="chart-select" value="light"><span class="radio-label" id="light"> Light</span></label><br>
+          <label><input type="radio" name="chart-select" value="soilMoisture"><span class="radio-label" id="soilMoisture"> Soil Moisture</span></label><br>
+        </ul>
       </div>
     </div>
 </nav>

@@ -55,6 +55,8 @@ organizeData = function(){
                borderWidth: 4,
                pointBackgroundColor: '#734500'
              }
+           } else {
+             data = {}
            }
 
            makeChart(labels, data);

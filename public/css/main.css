@@ -87,6 +87,15 @@ body {
   font-size: 1.5em;
 }
 
+.sidebar a{
+  font-size: 1.75em;
+  color: black;
+}
+
+.sidebar a:hover{
+  text-decoration: none;
+}
+
 span#temperature{
   color: #ff0000;
 }
@@ -107,11 +116,10 @@ span#soilMoisture{
   display: none;
 }
 
-a.nav-link p{
-  margin-bottom: 0px;
-  color: white;
+.sidebar span{
+    margin-left: 1.25em;
 }
 
-a#userMsg.nav-link:hover{
-  cursor: default;
+.sidebar span:hover{
+  cursor: pointer;
 }
