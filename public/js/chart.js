@@ -12,7 +12,7 @@ organizeData = function(){
            var data;
 
            logs.forEach((log) => {
-             labels.push(log.created);
+             labels.push(setTime(log.created));
              temperature.push(log.temperature);
              humidity.push(log.humidity);
              light.push(log.light);
@@ -91,6 +91,9 @@ makeChart = function(labels, data){
   }
 }
 
+setTime = function(time){
+  return time;
+}
 
 $(document).ready(organizeData);
 $("input[name='chart-select']").on("click",organizeData);

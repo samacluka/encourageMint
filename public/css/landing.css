@@ -37,22 +37,22 @@ body {
 }
 
 .slideshow li:nth-child(1) {
-  background-image: url(/images/land1.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349267/encouragemint/landing/land2_huzn0v.jpg);
 }
 .slideshow li:nth-child(2) {
-  background-image: url(/images/land2.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land4_g97r8s.jpg);
   animation-delay: 10s;
 }
 .slideshow li:nth-child(3) {
-  background-image: url(/images/land3.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land3_p9fwdx.jpg);
   animation-delay: 20s;
 }
 .slideshow li:nth-child(4) {
-  background-image: url(/images/land4.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land1_a0hy34.jpg);
   animation-delay: 30s;
 }
 .slideshow li:nth-child(5) {
-  background-image: url(/images/land5.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349264/encouragemint/landing/land5_caoaki.jpg);
   animation-delay: 40s;
 }
 
