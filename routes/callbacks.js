@@ -56,7 +56,7 @@ callbacks.auth.google.callback = passport.authenticate('google', {
 });
 
 callbacks.auth.google.success = function(req,res){
-  res.redirect("/");
+  res.redirect("/index");
 };
 
 // ======================================== INDEX ========================================
