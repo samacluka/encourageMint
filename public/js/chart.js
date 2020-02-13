@@ -91,10 +91,6 @@ makeChart = function(labels, data){
   }
 }
 
-setTime = function(time){
-  return time;
-}
-
 $(document).ready(organizeData);
 $("input[name='chart-select']").on("click",organizeData);
 setInterval(organizeData, 30000);

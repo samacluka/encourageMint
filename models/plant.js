@@ -6,6 +6,7 @@ var Log = require('./log.js');
 var plantSchema = new mongoose.Schema({
   Name: String,
   Type: String,
+  mc: String,
   Owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   Logs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Log' }],
   soilMoisture: {

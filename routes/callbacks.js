@@ -4,7 +4,8 @@ const passport        = require("passport");
 
 const User            = require(rootDir+"models/user.js"),
       Plant           = require(rootDir+"models/plant.js"),
-      Log             = require(rootDir+"models/log.js");
+      Log             = require(rootDir+"models/log.js"),
+      Config          = require(rootDir+"models/config.js");
 
 const views           = require(rootDir+"views/views.js");
 
@@ -36,6 +37,11 @@ var callbacks = {
       // logs
     }
   },
+  config: {
+    post:{
+      // new
+    }
+  }
 };
 
 // ======================================== AUTH ========================================
@@ -194,6 +200,92 @@ callbacks.controller.put.logs = function(req,res){
 
   }
 };
+
+// ======================================== CONFIGURATION ========================================
+
+callbacks.config.post.new = function(req,res){
+  var time = new Date();
+  time.setTime(time.getTime()-300000);
+
+  // Find anything newer than 5 minutes
+  var query = {created: {$gt: time}, ssid: req.body.ssid};
+
+  Config.findOne(query, (err, foundConfig) => {
+    if(err){
+      console.log(err);
+      return res.send(err);
+    }
+
+    if(req.body.mc){ // From Microcontroller
+      if(foundConfig){ // Second to hit route
+        console.log("Microcontroller was second to route");
+        Plant.findById(foundConfig.plant, (err, foundPlant) => {
+          if(err){
+            console.log(err);
+            res.send(err);
+          }
+
+          foundPlant.mc = req.body.mc;
+          foundPlant.save().then((savedPlant) => {
+            Config.deleteOne({ssid: req.body.ssid}, (err) => {
+              if(err){
+                console.log(err);
+                return res.send(err);
+              } else {
+                return res.send("Microcontroller successfully associated plant and Microcontroller");
+              }
+            });
+          });
+        });
+      } else { // First to hit route
+        console.log("Microcontroller was first to route");
+        Config.create({
+          mc: req.body.mc,
+          ssid: req.body.ssid
+        },(err, newConfig) => {
+          if(err){
+            console.log(err);
+            return res.send(err);
+          }
+          return res.send("Microcontroller successfully created config");
+        });
+      }
+    } else{ // From webapp
+      if(foundConfig){ // Second to hit route
+        console.log("Web app was second to route");
+        Plant.findById(req.body.plant, (err, foundPlant) => {
+          if(err){
+            console.log(err);
+            res.send(err);
+          }
+
+          foundPlant.mc = foundConfig.mc;
+          foundPlant.save().then((savedPlant) => {
+            Config.deleteOne({ssid: req.body.ssid}, (err) => {
+              if(err){
+                console.log(err);
+                res.send(err);
+              }
+              return res.send("Web app successfully associated plant and Microcontroller");
+            });
+          });
+        });
+      } else { // First
+        console.log("Web app was first to route");
+        Config.create({
+          plant: req.body.plant,
+          ssid: req.body.ssid
+        }, (err,newConfig) => {
+          if(err){
+            console.log(err);
+            return res.send(err);
+          }
+          return res.send("Web app successfully created config");
+        });
+      }
+    }
+  });
+}
 
 // ======================================== EXPORT ========================================
 module.exports = callbacks;

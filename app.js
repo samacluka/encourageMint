@@ -42,12 +42,14 @@ app.use(function(req,res,next){
 /* Create route variables*/
 const indexRoutes         = require("./routes/index"),
       controllerRoutes    = require("./routes/controller"),
-      authRoutes          = require("./routes/auth");
+      authRoutes          = require("./routes/auth"),
+      configRoutes          = require("./routes/config");
 
 //require routes
 app.use("/", indexRoutes);
 app.use("/controller",controllerRoutes);
 app.use("/auth",authRoutes);
+app.use("/config",configRoutes);
 
 /*=================================INIT - END=================================*/
 /*=================================LISTEN - BEGIN=============================*/
