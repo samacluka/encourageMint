@@ -4,7 +4,7 @@ const express = require("express"),
 const callbacks       = require("./callbacks.js");
 
 // GET
-router.get("/", callbacks.index.get.home);
+router.get("/", callbacks.index.get.landing);
 router.get("/index", callbacks.index.get.index);
 router.get("/index/data", callbacks.index.get.index_data);
 

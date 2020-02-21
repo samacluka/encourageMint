@@ -9,6 +9,8 @@ const User            = require(rootDir+"models/user.js"),
 
 const views           = require(rootDir+"views/views.js");
 
+const genUID          = require(rootDir+"helpers/UID.js");
+
 var callbacks = {
   auth: {
     // logout
@@ -67,8 +69,8 @@ callbacks.auth.google.success = function(req,res){
 
 // ======================================== INDEX ========================================
 // GET
-callbacks.index.get.home = function(req,res){
-  res.render(views.index.home);
+callbacks.index.get.landing = function(req,res){
+  res.render(views.index.landing);
 };
 
 callbacks.index.get.index = function(req,res){
@@ -232,7 +234,7 @@ callbacks.config.post.new = function(req,res){
                 console.log(err);
                 return res.send(err);
               } else {
-                return res.send("Microcontroller successfully associated plant and Microcontroller");
+                return res.send(genUID());
               }
             });
           });
@@ -247,7 +249,7 @@ callbacks.config.post.new = function(req,res){
             console.log(err);
             return res.send(err);
           }
-          return res.send("Microcontroller successfully created config");
+          return res.send(genUID());
         });
       }
     } else{ // From webapp
@@ -266,7 +268,7 @@ callbacks.config.post.new = function(req,res){
                 console.log(err);
                 res.send(err);
               }
-              return res.send("Web app successfully associated plant and Microcontroller");
+              return res.redirect("back");
             });
           });
         });
@@ -280,7 +282,7 @@ callbacks.config.post.new = function(req,res){
             console.log(err);
             return res.send(err);
           }
-          return res.send("Web app successfully created config");
+          return res.redirect("back");
         });
       }
     }
