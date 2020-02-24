@@ -14,43 +14,43 @@ var title;
 
 var svg;
 var line;
+var lineWidth = 4;
 
 function color(type){
-  if(type === "temperature"){
-    return 'red';
-  } else if(type === "humidity"){
-    return 'lightblue';
-  } else if(type === "soilMoisture"){
-    return 'blue';
-  } else if(type === "light"){
-    return 'orange';
-  } else{
-    return -1;
+  switch(type) {
+    case "temperature":
+      return '#bf0000';
+    case "humidity":
+      return '#0300bf';
+    case "soilMoisture":
+      return '#b80099';
+    case "light":
+      return '#00960a';
+    default:
+      return 'black';
   }
-}
-
-function getDesired(type, d){
-  if(type === "temperature"){
-    return d.temperature;
-  } else if(type === "humidity"){
-    return d.humidity;
-  } else if(type === "soilMoisture"){
-    return d.soilMoisture;
-  } else if(type === "light"){
-    return d.light;
-  } else{
-    return -1;
-  }
-}
-
-function formatTime(str){ // string to epoch
-  return new Date(str).getTime();
 }
 
 function formatData(type, data){
   data.forEach(function(d,i){
-    d.created = formatTime(d.created);
-    d.desired = getDesired(type,d)
+    d.created = new Date(d.created).getTime();
+
+    switch(type) {
+      case "temperature":
+        d.desired = d.temperature;
+        break;
+      case "humidity":
+        d.desired = d.humidity;
+        break;
+      case "soilMoisture":
+        d.desired = d.soilMoisture;
+        break;
+      case "light":
+        d.desired = d.light;
+        break;
+      default:
+        d.desired = -1;
+    }
   });
   return data;
 }
@@ -86,7 +86,7 @@ function initializeChart(){
             .call(d3.axisBottom(xScale)
                         .tickSize(-height + 2*padding)
                         .tickSizeOuter(0)
-                        .tickFormat(d3.timeFormat('%m/%d')));
+                        .tickFormat(d3.timeFormat('%m/%d - %H')));
 
     yAxis = svg
             .append('g')
@@ -102,7 +102,7 @@ function initializeChart(){
             .datum(data)
               .attr('fill', 'none')
               .attr('stroke', color(type))
-              .attr('stroke-wdith', 4)
+              .attr('stroke-width', lineWidth)
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
                 .y(function(d){ return yScale(d.desired); })
@@ -150,7 +150,7 @@ function updateChart(){
       .call(d3.axisBottom(xScale)
                   .tickSize(-height + 2*padding)
                   .tickSizeOuter(0)
-                  .tickFormat(d3.timeFormat('%m/%d')));
+                  .tickFormat(d3.timeFormat('%m/%d - %H')));
 
     yAxis
       .call(d3.axisLeft(yScale)
@@ -162,7 +162,7 @@ function updateChart(){
       .datum(data)
       .attr('fill', 'none')
       .attr('stroke', color(type))
-      .attr('stroke-wdith', 4)
+      .attr('stroke-width', lineWidth)
       .attr('d', d3.line()
         .x(function(d){ return xScale(d.created); })
         .y(function(d){ return yScale(d.desired); })
@@ -209,4 +209,5 @@ $(document).ready(function(){
   });
 
   initializeChart();
+  setInterval(updateChart, 30 * 1000);
 });
