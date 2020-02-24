@@ -13,7 +13,6 @@ var yAxisLabel;
 var title;
 
 var svg;
-var circles;
 var line;
 
 function color(type){
@@ -109,18 +108,6 @@ function initializeChart(){
                 .y(function(d){ return yScale(d.desired); })
               );
 
-    // Add points
-    circles = svg
-              .selectAll('circle')
-              .data(data, d => d.desired)
-              .enter()
-              .append('circle')
-                .attr('cx', d => xScale(d.created))
-                .attr('cy', d => yScale(d.desired))
-                .attr('r', 5)
-                .attr('fill', d => color(type))
-                .attr('stroke',"#fff");
-
 
     // Set X axis label
     xAxisLabel = svg
@@ -170,24 +157,6 @@ function updateChart(){
                   .tickSize(-width + 2*padding)
                   .tickSizeOuter(0));
 
-    circles = svg
-              .selectAll('circle')
-              .data(data, d => d.desired);
-
-    circles
-      .exit()
-      .remove()
-
-    // Add points
-    circles
-      .enter()
-      .append('circle')
-      .merge(circles)
-        .attr('cx', d => xScale(d.created))
-        .attr('cy', d => yScale(d.desired))
-        .attr('r', 5)
-        .attr('fill', d => color(type))
-        .attr('stroke',"#fff");
 
     line
       .datum(data)
