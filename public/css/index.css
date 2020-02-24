@@ -1,0 +1,58 @@
+div.flex-cont{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+
+div.flex-cont-vert{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+div.type-pills{
+  display: flex;
+  flex-direction: column;
+  margin: 3px;
+}
+
+div.time-pills{
+
+}
+
+span.type-pill{
+  margin: 3px;
+}
+
+span.time-pill{
+
+}
+
+#plant-select{
+  display: inline-block;
+  text-align: center;
+}
+
+#plant-label{
+  margin-right: 3px;
+}
+
+g.xAxis path.domain{
+  z-index: 1000;
+}
+
+svg {
+  margin: 0 auto;
+  display: block;
+}
+
+.tick line{
+  stroke: #ccc;
+  stroke-dasharray: 10, 5;
+}
+
+span:hover{
+  cursor: pointer;
+}

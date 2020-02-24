@@ -2,6 +2,8 @@ const rootDir = "../";
 
 const passport        = require("passport");
 
+const mongoose        = require('mongoose');
+
 const User            = require(rootDir+"models/user.js"),
       Plant           = require(rootDir+"models/plant.js"),
       Log             = require(rootDir+"models/log.js"),
@@ -23,6 +25,9 @@ var callbacks = {
   index: {
       get: {
         // index
+        data: {
+
+        }
       },
       post: {
         // register
@@ -74,23 +79,29 @@ callbacks.index.get.landing = function(req,res){
 };
 
 callbacks.index.get.index = function(req,res){
-  res.render(views.index.index);
+  Plant.find({Owner: req.user._id}, (err, foundPlants) => {
+    if (err) throw err;
+    res.render(views.index.index, {plants: foundPlants});
+  });
 };
 
-callbacks.index.get.index_data = function(req,res){
+callbacks.index.get.data.log = function(req,res){
   var time = new Date();
-  time.setDate(time.getDate()-7)%30;
+  time.setTime(time.getTime() - 3600 * req.params.time * 1000);
 
   // Find anything younger than one week
-  var query = {created: {$gt: time}}; // Making room for the query to be built up
+  var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
 
-  Log.find(query).limit(10).exec((err, logs) => {
-    if(err || !logs){
-      console.log(err | "No Logs");
-      res.send(err | "No Logs");
-    } else {
-      res.send(logs);
-    }
+  Log.find(query).sort('created').exec((err, logs) => {
+    if (err) throw err;
+    res.send(logs);
+  });
+}
+
+callbacks.index.get.data.plant = function(req,res){
+  Plant.find({Owner: req.params.uid}, (err, foundPlants) => {
+    if (err) throw err;
+    res.send(foundPlants);
   });
 }
 
@@ -106,7 +117,7 @@ callbacks.index.post.newPlant = function(req, res){
   var PlantObj = {
       Name: req.body.name,
       Type: req.body.type,
-      Owner: req.user,
+      Owner: req.user._id,
       soilMoisture: {
         min: req.body.soilMoistureMin,
         max: req.body.soilMoistureMax
@@ -118,12 +129,8 @@ callbacks.index.post.newPlant = function(req, res){
     };
 
   Plant.create(PlantObj, (err, newPlant) => {
-          if(err){
-            console.log(err);
-            res.send(err);
-          } else {
-            res.render(views.index.index);
-          }
+          if(err) throw err;
+          res.render(views.index.index);
         });
 }
 
@@ -131,7 +138,7 @@ callbacks.index.put.updatePlant = function(req, res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     foundPlant.Name = req.body.name;
     foundPlant.Type = req.body.type;
-    foundPlant.Owner = req.user;
+    foundPlant.Owner = req.user._id;
     foundPlant.soilMoisture.min = req.body.soilMoistureMin;
     foundPlant.soilMoisture.max = req.body.soilMoistureMax;
     foundPlant.lightThreshold.min = req.body.lightThresholdMin;
@@ -207,67 +214,49 @@ callbacks.controller.put.logs = function(req,res){
 
 callbacks.config.post.new = function(req,res){
   var time = new Date();
-  time.setTime(time.getTime()-300000);
+  time.setTime(time.getTime() - 60 * 5 * 1000);
 
   // Find anything newer than 5 minutes
   var query = {created: {$gt: time}, ssid: req.body.ssid};
 
   Config.findOne(query, (err, foundConfig) => {
-    if(err){
-      console.log(err);
-      return res.send(err);
-    }
+    if(err) throw err;
 
     if(req.body.mc){ // From Microcontroller
+      var mcid = genUID();
       if(foundConfig){ // Second to hit route
         console.log("Microcontroller was second to route");
         Plant.findById(foundConfig.plant, (err, foundPlant) => {
-          if(err){
-            console.log(err);
-            res.send(err);
-          }
+          if(err) throw err;
 
-          foundPlant.mc = req.body.mc;
+          foundPlant.mc = mcid;
           foundPlant.save().then((savedPlant) => {
             Config.deleteOne({ssid: req.body.ssid}, (err) => {
-              if(err){
-                console.log(err);
-                return res.send(err);
-              } else {
-                return res.send(genUID());
-              }
+              if(err) throw err;
+              return res.send(mcid);
             });
           });
         });
       } else { // First to hit route
         console.log("Microcontroller was first to route");
         Config.create({
-          mc: req.body.mc,
+          mc: mcid,
           ssid: req.body.ssid
         },(err, newConfig) => {
-          if(err){
-            console.log(err);
-            return res.send(err);
-          }
-          return res.send(genUID());
+          if(err) throw err;
+          return res.send(mcid);
         });
       }
     } else{ // From webapp
       if(foundConfig){ // Second to hit route
         console.log("Web app was second to route");
         Plant.findById(req.body.plant, (err, foundPlant) => {
-          if(err){
-            console.log(err);
-            res.send(err);
-          }
+          if(err) throw err;
 
           foundPlant.mc = foundConfig.mc;
           foundPlant.save().then((savedPlant) => {
             Config.deleteOne({ssid: req.body.ssid}, (err) => {
-              if(err){
-                console.log(err);
-                res.send(err);
-              }
+              if(err) throw err;
               return res.redirect("back");
             });
           });
@@ -278,10 +267,7 @@ callbacks.config.post.new = function(req,res){
           plant: req.body.plant,
           ssid: req.body.ssid
         }, (err,newConfig) => {
-          if(err){
-            console.log(err);
-            return res.send(err);
-          }
+          if(err) throw err;
           return res.redirect("back");
         });
       }

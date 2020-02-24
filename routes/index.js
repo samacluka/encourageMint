@@ -6,7 +6,8 @@ const callbacks       = require("./callbacks.js");
 // GET
 router.get("/", callbacks.index.get.landing);
 router.get("/index", callbacks.index.get.index);
-router.get("/index/data", callbacks.index.get.index_data);
+router.get("/log/data/:id/:time", callbacks.index.get.data.log);
+router.get("/plant/data/:uid", callbacks.index.get.data.plant);
 
 router.get("/newPlant", callbacks.index.get.newPlant);
 router.get("/updatePlant", callbacks.index.get.updatePlant);

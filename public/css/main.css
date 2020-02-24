@@ -1,4 +1,5 @@
 body {
+  padding-top: 10%;
   font-size: .875rem;
   color: black;
 }
@@ -122,4 +123,8 @@ span#soilMoisture{
 
 .sidebar span:hover{
   cursor: pointer;
+}
+
+a.nav-link{
+  height: 100%;
 }

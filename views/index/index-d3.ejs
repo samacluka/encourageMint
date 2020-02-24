@@ -1,0 +1,55 @@
+<% const views = '../' %>
+<%- include(views+'partials/header'); %>
+
+<div class="flex-cont">
+  <div class="type-pills">
+    <span class="badge badge-primary type-pill" data-type="temperature">Temperature</span>
+    <span class="badge badge-success type-pill" data-type="humidity">Humidity</span>
+    <span class="badge badge-success type-pill" data-type="soilMoisture">Soil Moisture</span>
+    <span class="badge badge-success type-pill" data-type="light">Light Intensity</span>
+  </div>
+
+  <div class="flex-cont-vert">
+
+      <!-- <form class="form-inline" id="plant-form">
+        <label id="plant-label" for="plant-select">Temperature vs. Time Data for </label> -->
+      <div id="plant-form">
+        <h3 id="plant-label" for="plant-select">Temperature vs. Time</h3>
+        <select class="form-control form-control-sm" id="plant-select">
+          <% plants.forEach((plant, index) => { %>
+            <% if(index === 0){ %>
+              <option value="<%= plant.id %>" selected><%= plant.Name %></option>
+            <% } else { %>
+              <option value="<%= plant.id %>"><%= plant.Name %></option>
+            <% } %>
+          <% }) %>
+        </select>
+      </div>
+      <!-- </form> -->
+
+
+    <div class="svg">
+      <svg
+      version="1.1"
+      baseProfile="full"
+      xmlns="http://www.w3.org/2000/svg" >
+      </svg>
+    </div>
+
+    <div class="time-pills">
+      <span class="badge badge-primary time-pill" data-time="2">2h</span>
+      <span class="badge badge-success time-pill" data-time="12">12h</span>
+      <span class="badge badge-success time-pill" data-time="24">1D</span>
+      <span class="badge badge-success time-pill" data-time="72">3D</span>
+      <span class="badge badge-success time-pill" data-time="168">1W</span>
+      <span class="badge badge-success time-pill" data-time="336">2W</span>
+      <span class="badge badge-success time-pill" data-time="672">1M</span>
+      <span class="badge badge-success time-pill" data-time="0">MAX</span>
+    </div>
+
+  </div>
+</div>
+
+
+
+<%- include(views+'partials/footer'); %>
