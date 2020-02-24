@@ -16,11 +16,6 @@ var svg;
 var circles;
 var line;
 
-var data;
-var bisect;
-var focus;
-var focusText;
-
 function color(type){
   if(type === "temperature"){
     return 'red';
@@ -65,33 +60,6 @@ function capitalize(str){
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// What happens when the mouse move -> show the annotations at the right positions.
-function mouseover(){
-  focus.style("opacity", 1)
-  focusText.style("opacity",1)
-}
-
-function mousemove(){
-  // recover coordinate we need
-  var x0 = xScale.invert(d3.mouse(this)[0]);
-  var i = bisect(data, x0, 1);
-  selectedData = data[i]
-
-  focus
-    .attr("cx", xScale(selectedData.created))
-    .attr("cy", yScale(selectedData.desired));
-
-  focusText
-    .html("x:" + new Date(selectedData.created).toGMTString() + "  -  " + "y:" + selectedData.desired)
-    .attr("x", xScale(selectedData.created)+15)
-    .attr("y", yScale(selectedData.desired));
-}
-
-function mouseout(){
-  focus.style("opacity", 0)
-  focusText.style("opacity", 0)
-}
-
 function initializeChart(){
   var time = $('div.time-pills span.badge-primary').data('time');
   var plantid = $("select#plant-select option:selected").val();
@@ -129,7 +97,6 @@ function initializeChart(){
                         .tickSize(-width + 2*padding)
                         .tickSizeOuter(0));
 
-    bisect = d3.bisector(function(d) { return d.created; }).left;
 
     line = svg
             .append('path')
@@ -153,33 +120,6 @@ function initializeChart(){
                 .attr('r', 5)
                 .attr('fill', d => color(type))
                 .attr('stroke',"#fff");
-
-    focus = svg
-            .append('g')
-            .append('circle')
-              .style("fill", "none")
-              .attr("stroke", "black")
-              .attr('r', 8.5)
-              .style("opacity", 0);
-
-      // Create the text that travels along the curve of chart
-      focusText = svg
-                  .append('g')
-                  .append('text')
-                    .style("opacity", 0)
-                    .attr("text-anchor", "left")
-                    .attr("alignment-baseline", "middle");
-
-      // Create a rect on top of the svg area: this rectangle recovers mouse position
-      svg
-        .append('rect')
-        .style("fill", "none")
-        .style("pointer-events", "all")
-        .attr('width', width)
-        .attr('height', height)
-        .on('mouseover', mouseover)
-        .on('mousemove', mousemove)
-        .on('mouseout', mouseout);
 
 
     // Set X axis label
@@ -230,8 +170,6 @@ function updateChart(){
                   .tickSize(-width + 2*padding)
                   .tickSizeOuter(0));
 
-    bisect = d3.bisector(function(d) { return d.created; }).left;
-
     circles = svg
               .selectAll('circle')
               .data(data, d => d.desired);
@@ -261,10 +199,8 @@ function updateChart(){
         .y(function(d){ return yScale(d.desired); })
       );
 
-
-
     // Update Title
-    $("#plant-label").text(`${capitalize(type.toString())} vs. Time`); // Update label
+    $("#title").text(`${capitalize(type.toString())} vs. Time`); // Update label
     $.ajax({ type: "GET",
         url: `/plant/data/${$('a#navbarDropdown').data("uid")}`,
         async: true,

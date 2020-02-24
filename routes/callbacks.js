@@ -87,7 +87,7 @@ callbacks.index.get.index = function(req,res){
 
 callbacks.index.get.data.log = function(req,res){
   var time = new Date();
-  time.setTime(time.getTime() - 3600 * req.params.time * 1000);
+  time.setTime(time.getTime() - req.params.time * 60 * 60 * 1000);
 
   // Find anything younger than one week
   var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
@@ -186,7 +186,7 @@ callbacks.controller.put.logs = function(req,res){
     }
 
     var time = new Date();
-    time.setDate(time.getDate()-7)%30; // One week ago
+    time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago
     //Delete any logs older than a week
     Log.deleteMany({created: {$lt: time}}, (err) => {
       if(err){

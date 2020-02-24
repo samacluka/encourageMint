@@ -35,12 +35,8 @@ span.time-pill{
   text-align: center;
 }
 
-#plant-label{
+#title{
   margin-right: 3px;
-}
-
-g.xAxis path.domain{
-  z-index: 1000;
 }
 
 svg {
