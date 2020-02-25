@@ -1,5 +1,5 @@
 var height = 600;
-var width = 800;
+var width = 1200;
 var padding = 50;
 
 var yScale;
@@ -16,6 +16,10 @@ var svg;
 var line;
 var lineWidth = 4;
 
+function capitalize(str){
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function color(type){
   switch(type) {
     case "temperature":
@@ -28,6 +32,42 @@ function color(type){
       return '#00960a';
     default:
       return 'black';
+  }
+}
+
+function getYLabel(type){
+  switch(type) {
+    case "temperature":
+      return 'Temperature (°C)';
+    case "humidity":
+      return 'Humidity (g/kg)';
+    case "soilMoisture":
+      return 'Soil Moisture (g/kg)';
+    case "light":
+      return 'Light Initensity (lm)';
+    default:
+      return 'Error';
+  }
+}
+
+function getTimeFormat(time){
+  switch(time) {
+    case 1:
+      return '%M';
+    case 2:
+      return '%H:%M';
+    case 12:
+      return '%H:%M';
+    case 24:
+      return '%H:%M';
+    case 72:
+      return '%d - %H:%M';
+    case 168:
+      return '%d - %H';
+    case 336:
+      return '%d';
+    default:
+      return 'Error';
   }
 }
 
@@ -55,14 +95,10 @@ function formatData(type, data){
   return data;
 }
 
-function capitalize(str){
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 function initializeChart(){
-  var time = $('div.time-pills span.badge-primary').data('time');
+  var time = $('div.time-pills a.selected').data('time');
   var plantid = $("select#plant-select option:selected").val();
-  var type = $('div.type-pills span.badge-primary').data('type');
+  var type = $('div.type-pills a.selected').data('type');
 
   d3.json(`/log/data/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
@@ -86,7 +122,7 @@ function initializeChart(){
             .call(d3.axisBottom(xScale)
                         .tickSize(-height + 2*padding)
                         .tickSizeOuter(0)
-                        .tickFormat(d3.timeFormat('%m/%d - %H')));
+                        .tickFormat(d3.timeFormat(getTimeFormat(time))));
 
     yAxis = svg
             .append('g')
@@ -116,7 +152,7 @@ function initializeChart(){
                     .attr('y', height - padding)
                     .attr('dy', '2em')
                     .style('text-anchor','middle')
-                    .text('X Label');
+                    .text('Time');
 
     // Set Y axis label
     yAxisLabel = svg
@@ -126,14 +162,14 @@ function initializeChart(){
                     .attr('y', padding)
                     .attr('dy', '-2em')
                     .style('text-anchor','middle')
-                    .text('Y Label');
+                    .text(getYLabel(type));
   });
 }
 
 function updateChart(){
-  var time = $('div.time-pills span.badge-primary').data('time');
+  var time = $('div.time-pills > a.selected').data('time');
   var plantid = $("select#plant-select option:selected").val();
-  var type = $('div.type-pills span.badge-primary').data('type');
+  var type = $('div.type-pills a.selected').data('type');
 
   d3.json(`/log/data/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
@@ -150,13 +186,12 @@ function updateChart(){
       .call(d3.axisBottom(xScale)
                   .tickSize(-height + 2*padding)
                   .tickSizeOuter(0)
-                  .tickFormat(d3.timeFormat('%m/%d - %H')));
+                  .tickFormat(d3.timeFormat(getTimeFormat(time))));
 
     yAxis
       .call(d3.axisLeft(yScale)
                   .tickSize(-width + 2*padding)
                   .tickSizeOuter(0));
-
 
     line
       .datum(data)
@@ -187,22 +222,24 @@ function updateChart(){
           $('select#plant-select').html(str);
         }
       }); // Update Select
-    xAxisLabel.text('X Label'); // Update X
-    yAxisLabel.text('Y Label'); // Update Y
+    xAxisLabel.text('Time'); // Update X
+    yAxisLabel.text(getYLabel(type)); // Update Y
   });
 }
 
 function selectPill(event){
-  $(`div.${event.data.str}-pills span.badge-primary`).addClass('badge-success');
-  $(`div.${event.data.str}-pills span.badge-primary`).removeClass('badge-primary');
-  $(this).removeClass('badge-success');
-  $(this).addClass('badge-primary');
+  $(`div.${event.data.str}-pills a.selected`).addClass('badge-light');
+  $(`div.${event.data.str}-pills a.selected`).removeClass('badge-dark');
+  $(`div.${event.data.str}-pills a.selected`).removeClass('selected');
+  $(this).removeClass('badge-light');
+  $(this).addClass('badge-dark');
+  $(this).addClass('selected');
   updateChart();
 }
 
 $(document).ready(function(){
-  $('div.type-pills span').on('click', {str: 'type'}, selectPill);
-  $('div.time-pills span').on('click', {str: 'time'}, selectPill);
+  $('div.type-pills a').on('click', {str: 'type'}, selectPill);
+  $('div.time-pills a').on('click', {str: 'time'}, selectPill);
   $('select#plant-select').on('change', function(event){
     updateChart();
     event.stopPropagation();
