@@ -4,7 +4,6 @@ const express         = require("express"),
       bodyParser      = require("body-parser"),
       mongoose        = require("mongoose"),
       methodOverride  = require("method-override"),
-      flash           = require("connect-flash"),
       fs              = require("file-system"),
       path            = require("path"),
       dotenv          = require("dotenv").config(); // Configure .env variables
@@ -20,7 +19,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine","ejs");
 app.use(express.static(__dirname + '/public'));
 app.use(methodOverride("_method"));
-app.use(flash());
 
 //Passport Config
 var passport = require("./auth/google.js");
@@ -34,8 +32,6 @@ app.use(passport.session());
 // Send to all views
 app.use(function(req,res,next){
   res.locals.currentUser    = req.user;
-  res.locals.error          = req.flash("error");
-  res.locals.success        = req.flash("success");
   next();
 });
 
