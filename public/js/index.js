@@ -16,6 +16,8 @@ var svg;
 var line;
 var lineWidth = 4;
 
+var data;
+
 function capitalize(str){
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -53,7 +55,7 @@ function getYLabel(type){
 function getTimeFormat(time){
   switch(time) {
     case 1:
-      return '%M';
+      return '%H:%M';
     case 2:
       return '%H:%M';
     case 12:
@@ -61,11 +63,11 @@ function getTimeFormat(time){
     case 24:
       return '%H:%M';
     case 72:
-      return '%d - %H:%M';
+      return '%m/%d - %H:%M';
     case 168:
-      return '%d - %H';
+      return '%m/%d - %H';
     case 336:
-      return '%d';
+      return '%m/%d';
     default:
       return 'Error';
   }
@@ -95,21 +97,34 @@ function formatData(type, data){
   return data;
 }
 
-function initializeChart(){
+function setScales(time, data){
+  var now = new Date().getTime();
+  var prev = now - parseInt(time) * 60 * 60 * 1000;
+
+  yScale = d3.scaleLinear()
+               .domain(d3.extent(data, d => d.desired))
+               .range([height - padding, padding]);
+
+  xScale = d3.scaleTime()
+              // .domain(d3.extent(data, d => d.created)) // Stretch available data across whole domain
+              .domain([prev, now])                        // Use time scale for width
+              .range([padding, width - padding]);
+}
+
+function getSelection(){
   var time = $('div.time-pills a.selected').data('time');
   var plantid = $("select#plant-select option:selected").val();
   var type = $('div.type-pills a.selected').data('type');
+  return [time, plantid, type];
+}
+
+function initializeChart(){
+  var [time, plantid, type] = getSelection();
 
   d3.json(`/log/data/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
 
-    yScale = d3.scaleLinear()
-                 .domain(d3.extent(data, d => d.desired))
-                 .range([height - padding, padding]);
-
-    xScale = d3.scaleTime()
-                .domain(d3.extent(data, d => d.created))
-                .range([padding, width - padding]);
+    setScales(time, data);
 
     svg = d3.select('svg')
               .attr('width', width)
@@ -148,63 +163,67 @@ function initializeChart(){
     // Set X axis label
     xAxisLabel = svg
                   .append('text')
+                    .attr('id','xAxisLabel')
+                    .classed('axisLabel',true)
                     .attr('x', width / 2)
                     .attr('y', height - padding)
-                    .attr('dy', '2em')
+                    .attr('dy', '2.2em')
                     .style('text-anchor','middle')
                     .text('Time');
 
     // Set Y axis label
     yAxisLabel = svg
                   .append('text')
+                    .attr('id','yAxisLabel')
+                    .classed('axisLabel',true)
                     .attr('transform', 'rotate(-90)')
                     .attr('x', -height / 2)
                     .attr('y', padding)
-                    .attr('dy', '-2em')
+                    .attr('dy', '-1.5em')
                     .style('text-anchor','middle')
                     .text(getYLabel(type));
   });
 }
 
 function updateChart(){
-  var time = $('div.time-pills > a.selected').data('time');
-  var plantid = $("select#plant-select option:selected").val();
-  var type = $('div.type-pills a.selected').data('type');
+  var [time, plantid, type] = getSelection();
 
   d3.json(`/log/data/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
 
-    yScale = d3.scaleLinear()
-                 .domain(d3.extent(data, d => d.desired))
-                 .range([height - padding, padding]);
-
-    xScale = d3.scaleTime()
-                .domain(d3.extent(data, d => d.created))
-                .range([padding, width - padding]);
+    setScales(time, data);
 
     xAxis
+      .transition()
+      .duration(1000)
       .call(d3.axisBottom(xScale)
                   .tickSize(-height + 2*padding)
                   .tickSizeOuter(0)
                   .tickFormat(d3.timeFormat(getTimeFormat(time))));
 
     yAxis
+      .transition()
+      .duration(1000)
       .call(d3.axisLeft(yScale)
                   .tickSize(-width + 2*padding)
                   .tickSizeOuter(0));
 
     line
       .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', color(type))
-      .attr('stroke-width', lineWidth)
-      .attr('d', d3.line()
-        .x(function(d){ return xScale(d.created); })
-        .y(function(d){ return yScale(d.desired); })
-      );
+        .transition()
+        .duration(1000)
+        .attr('fill', 'none')
+        .attr('stroke', color(type))
+        .attr('stroke-width', lineWidth)
+        .attr('d', d3.line()
+          .x(function(d){ return xScale(d.created); })
+          .y(function(d){ return yScale(d.desired); })
+        );
 
     // Update Title
-    $("#title").text(`${capitalize(type.toString())} vs. Time`); // Update label
+    $("#title").text(`${capitalize(type.toString())} vs. Time`); // Update title
+
+    // Update Select
     $.ajax({ type: "GET",
         url: `/plant/data/${$('a#navbarDropdown').data("uid")}`,
         async: true,
@@ -221,9 +240,15 @@ function updateChart(){
 
           $('select#plant-select').html(str);
         }
-      }); // Update Select
-    xAxisLabel.text('Time'); // Update X
-    yAxisLabel.text(getYLabel(type)); // Update Y
+      });
+
+      // Update X
+    xAxisLabel
+      .text('Time');
+
+      // Update Y
+    yAxisLabel
+      .text(getYLabel(type));
   });
 }
 
@@ -238,6 +263,8 @@ function selectPill(event){
 }
 
 $(document).ready(function(){
+  $('div.empty').width($('div.type-pills').width()); // to center the svg
+
   $('div.type-pills a').on('click', {str: 'type'}, selectPill);
   $('div.time-pills a').on('click', {str: 'time'}, selectPill);
   $('select#plant-select').on('change', function(event){

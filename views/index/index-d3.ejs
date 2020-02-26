@@ -17,31 +17,35 @@
       <% plants.forEach((plant, index) => { %>
         <% if(index === 0){ %>
           <option value="<%= plant.id %>" selected><%= plant.Name %></option>
-        <% } else { %>
-          <option value="<%= plant.id %>"><%= plant.Name %></option>
-        <% } %>
-      <% }) %>
-    </select>
+          <% } else { %>
+            <option value="<%= plant.id %>"><%= plant.Name %></option>
+            <% } %>
+            <% }) %>
+          </select>
 
 
-    <div class="svg">
-      <svg
-      version="1.1"
-      baseProfile="full"
-      xmlns="http://www.w3.org/2000/svg" >
-      </svg>
-    </div>
+          <div class="svg">
+            <svg
+            version="1.1"
+            baseProfile="full"
+            xmlns="http://www.w3.org/2000/svg" >
+          </svg>
+        </div>
 
-    <div class="time-pills">
-      <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
-      <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
-    </div>
+        <div class="time-pills">
+          <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
+          <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
+        </div>
 
+  </div>
+
+  <div class="empty">
+    <!-- empty div for flexbox spacing purposes -->
   </div>
 </div>
 
