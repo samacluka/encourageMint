@@ -103,7 +103,13 @@ callbacks.index.get.data.log = function(req,res){
 }
 
 callbacks.index.get.data.plant = function(req,res){
-  Plant.find({Owner: req.params.uid}, (err, foundPlants) => {
+  if(req.params.type === 'uid'){
+    var query = {Owner: req.params.id};
+  } else if(req.params.type === 'pid') {
+    var query = {_id: req.params.id};
+  }
+
+  Plant.find(query, (err, foundPlants) => {
     if (err) throw err;
     res.send(foundPlants);
   });

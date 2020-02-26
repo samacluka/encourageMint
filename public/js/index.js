@@ -225,7 +225,7 @@ function updateChart(){
 
     // Update Select
     $.ajax({ type: "GET",
-        url: `/plant/data/${$('a#navbarDropdown').data("uid")}`,
+        url: `/plant/data/${$('a#navbarDropdown').data("uid")}/uid`,
         async: true,
         success : function(plants){
           var str = "";
