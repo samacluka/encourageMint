@@ -3,9 +3,11 @@ const express = require("express"),
 
 const callbacks       = require("./callbacks.js");
 
+const is              = require("../middleware/is.js");
+
 // GET
 router.get("/", callbacks.index.get.landing);
-router.get("/index", callbacks.index.get.index);
+router.get("/index", is.LoggedIn, callbacks.index.get.index);
 router.get("/log/data/:id/:time", callbacks.index.get.data.log);
 router.get("/plant/data/:uid", callbacks.index.get.data.plant);
 
