@@ -109,14 +109,7 @@ callbacks.index.get.data.plant = function(req,res){
   });
 }
 
-callbacks.index.get.newPlant = function(req, res){
-  res.render(views.index.newPlant);
-}
-
-callbacks.index.get.updatePlant = function(req, res){
-  res.render(view.index.updatePlant);
-}
-
+// POST
 callbacks.index.post.newPlant = function(req, res){
   var PlantObj = {
       Name: req.body.name,
@@ -138,6 +131,7 @@ callbacks.index.post.newPlant = function(req, res){
         });
 }
 
+// PUT
 callbacks.index.put.updatePlant = function(req, res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     foundPlant.Name = req.body.name;
@@ -216,6 +210,7 @@ callbacks.controller.put.logs = function(req,res){
 
 // ======================================== CONFIGURATION ========================================
 
+// POST
 callbacks.config.post.new = function(req,res){
   var time = new Date();
   time.setTime(time.getTime() - 60 * 5 * 1000);
