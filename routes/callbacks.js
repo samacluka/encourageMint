@@ -232,8 +232,10 @@ callbacks.config.post.new = function(req,res){
   var time = new Date();
   time.setTime(time.getTime() - 5 * 60 * 1000);
 
+  reqIp = req.clientIp.split('.')[0] + req.clientIp.split('.')[1]; // concat first two elements of ip
+
   // Find anything newer than 5 minutes
-  var query = {created: {$gt: time}, ip: req.clientIp};
+  var query = {created: {$gt: time}, ip: reqIp};
 
   Config.findOne(query, (err, foundConfig) => {
     if(err) throw err;
@@ -247,7 +249,7 @@ callbacks.config.post.new = function(req,res){
 
           foundPlant.mc = mcid;
           foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ip: req.clientIp}, (err) => {
+            Config.deleteOne({ip: reqIp}, (err) => {
               if(err) throw err;
               console.log('Microcontroller finished config');
               return res.send(mcid);
@@ -258,7 +260,7 @@ callbacks.config.post.new = function(req,res){
         console.log("Microcontroller was first to route");
         Config.create({
           mc: mcid,
-          ip: req.clientIp
+          ip: reqIp
         },(err, newConfig) => {
           if(err) throw err;
           console.log('Microcontroller started config');
@@ -273,7 +275,7 @@ callbacks.config.post.new = function(req,res){
 
           foundPlant.mc = foundConfig.mc;
           foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ip: req.clientIp}, (err) => {
+            Config.deleteOne({ip: reqIp}, (err) => {
               if(err) throw err;
               console.log('Web App finished config');
               return res.end();
@@ -284,7 +286,7 @@ callbacks.config.post.new = function(req,res){
         console.log("Web app was first to route");
         Config.create({
           plant: req.body.plant,
-          ip: req.clientIp
+          ip: reqIp
         }, (err,newConfig) => {
           if(err) throw err;
           console.log('Web app started config');
