@@ -37,6 +37,21 @@ function color(type){
   }
 }
 
+function getTitle(type){
+  switch(type) {
+    case "temperature":
+      return 'Temperature';
+    case "humidity":
+      return 'Humidity';
+    case "soilMoisture":
+      return 'Soil Moisture';
+    case "light":
+      return 'Light';
+    default:
+      return 'Data';
+  }
+}
+
 function getYLabel(type){
   switch(type) {
     case "temperature":
@@ -120,6 +135,7 @@ function getSelection(){
 
 function initializeChart(){
   var [time, plantid, type] = getSelection();
+  if(!plantid) return;
 
   d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
@@ -187,6 +203,7 @@ function initializeChart(){
 
 function updateChart(){
   var [time, plantid, type] = getSelection();
+  if(!plantid) return;
 
   d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
@@ -221,7 +238,7 @@ function updateChart(){
         );
 
     // Update Title
-    $("#title").text(`${capitalize(type.toString())} vs. Time`); // Update title
+    $("#title").text(`${getTitle(type)} vs. Time`); // Update title
 
     // Update Select
     $.ajax({ type: "GET",
@@ -270,6 +287,7 @@ $(document).ready(function(){
   $('select#plant-select').on('change', function(event){
     updateChart();
     event.stopPropagation();
+    if(!$(this).val()) return;
     $.ajax({ type: "GET",
         url: `/data/plant/${$(this).val()}/pid`,
         async: true,
