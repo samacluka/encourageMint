@@ -73,8 +73,8 @@ function getTimeFormat(time){
   }
 }
 
-function formatData(type, data){
-  data.forEach(function(d,i){
+function formatData(type, Data){
+  Data.forEach(function(d,i){
     d.created = new Date(d.created).getTime();
 
     switch(type) {
@@ -94,15 +94,15 @@ function formatData(type, data){
         d.desired = -1;
     }
   });
-  return data;
+  return Data;
 }
 
-function setScales(time, data){
+function setScales(time, Data){
   var now = new Date().getTime();
   var prev = now - parseInt(time) * 60 * 60 * 1000;
 
   yScale = d3.scaleLinear()
-               .domain(d3.extent(data, d => d.desired))
+               .domain(d3.extent(Data, d => d.desired))
                .range([height - padding, padding]);
 
   xScale = d3.scaleTime()
@@ -274,11 +274,18 @@ $(document).ready(function(){
         url: `/data/plant/${$(this).val()}/pid`,
         async: true,
         success : function(plant){
+          [plant] = plant; // remove array wrapper
           if(!plant.mc){
-            // $('button#register-plant').attr()
+            $('button#registerPlant').show({duration: 800});
+          } else {
+            $('button#registerPlant').hide({duration: 400});
           }
         }
       });
+  });
+  $('button#registerPlant').on('click', function(event){
+    $.post( "/config/new", { plant: $('select#plant-select').val() });
+    $(this).hide({duration: 400});
   });
 
   initializeChart();

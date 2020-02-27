@@ -24,6 +24,12 @@ div.time-pills{
   width: 65%
 }
 
+div.plantSelect-registerButton{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 a.type-pill{
   margin: 3px;
 }
@@ -35,6 +41,11 @@ a.badge{
 a.badge-light {
   border: 1px solid #e7e7e7;
   background-color: #e8e8e8;
+}
+
+button#registerPlant{
+  display: none;
+  margin-left: 20px;
 }
 
 #plant-select{

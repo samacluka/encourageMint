@@ -10,16 +10,19 @@
   </div>
   <div class="flex-cont-vert">
     <h3 id="title" for="plant-select">Temperature vs. Time</h3>
-    <div class="from-group">
-      <select class="form-control" id="plant-select">
-        <% plants.forEach((plant, index) => { %>
-          <% if(index === 0){ %>
-            <option value="<%= plant.id %>" selected><%= plant.Name %></option>
-          <% } else { %>
-            <option value="<%= plant.id %>"><%= plant.Name %></option>
-          <% } %>
-        <% }) %>
-      </select>
+    <div class="plantSelect-registerButton">
+      <div class="from-group">
+        <select class="form-control" id="plant-select">
+          <% plants.forEach((plant, index) => { %>
+            <% if(index === 0){ %>
+              <option value="<%= plant.id %>" selected><%= plant.Name %></option>
+            <% } else { %>
+              <option value="<%= plant.id %>"><%= plant.Name %></option>
+            <% } %>
+          <% }) %>
+        </select>
+      </div>
+      <button type="button" id="registerPlant" class="btn btn-warning">Register Plant</button>
     </div>
     <div class="svg">
       <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"></svg>
