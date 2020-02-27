@@ -6,6 +6,7 @@ const express         = require("express"),
       methodOverride  = require("method-override"),
       fs              = require("file-system"),
       path            = require("path"),
+      requestIp       = require('request-ip'),
       dotenv          = require("dotenv").config(); // Configure .env variables
 
 /* Configure Database */
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine","ejs");
 app.use(express.static(__dirname + '/public'));
 app.use(methodOverride("_method"));
+app.use(requestIp.mw());
 
 //Passport Config
 var passport = require("./auth/google.js");

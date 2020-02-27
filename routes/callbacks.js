@@ -235,16 +235,17 @@ callbacks.controller.put.logs = function(req,res){
 
 // POST
 callbacks.config.post.new = function(req,res){
+  console.log(req.clientIp);
   var time = new Date();
-  time.setTime(time.getTime() - 60 * 5 * 1000);
+  time.setTime(time.getTime() - 5 * 60 * 1000);
 
   // Find anything newer than 5 minutes
-  var query = {created: {$gt: time}, ssid: req.body.ssid};
+  var query = {created: {$gt: time}, ip: req.clientIp};
 
   Config.findOne(query, (err, foundConfig) => {
     if(err) throw err;
 
-    if(req.body.mc){ // From Microcontroller
+    if(!req.body.plant){ // From Microcontroller
       var mcid = genUID();
       if(foundConfig){ // Second to hit route
         console.log("Microcontroller was second to route");
@@ -253,8 +254,9 @@ callbacks.config.post.new = function(req,res){
 
           foundPlant.mc = mcid;
           foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ssid: req.body.ssid}, (err) => {
+            Config.deleteOne({ip: req.clientIp}, (err) => {
               if(err) throw err;
+              console.log('Microcontroller finished config');
               return res.send(mcid);
             });
           });
@@ -263,9 +265,10 @@ callbacks.config.post.new = function(req,res){
         console.log("Microcontroller was first to route");
         Config.create({
           mc: mcid,
-          ssid: req.body.ssid
+          ip: req.clientIp
         },(err, newConfig) => {
           if(err) throw err;
+          console.log('Microcontroller started config');
           return res.send(mcid);
         });
       }
@@ -277,9 +280,10 @@ callbacks.config.post.new = function(req,res){
 
           foundPlant.mc = foundConfig.mc;
           foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ssid: req.body.ssid}, (err) => {
+            Config.deleteOne({ip: req.clientIp}, (err) => {
               if(err) throw err;
-              return res.redirect("back");
+              console.log('Web App finished config');
+              return res.end();
             });
           });
         });
@@ -287,10 +291,11 @@ callbacks.config.post.new = function(req,res){
         console.log("Web app was first to route");
         Config.create({
           plant: req.body.plant,
-          ssid: req.body.ssid
+          ip: req.clientIp
         }, (err,newConfig) => {
           if(err) throw err;
-          return res.redirect("back");
+          console.log('Web app started config');
+          return res.end();
         });
       }
     }
