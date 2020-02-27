@@ -121,7 +121,7 @@ function getSelection(){
 function initializeChart(){
   var [time, plantid, type] = getSelection();
 
-  d3.json(`/log/data/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
 
     setScales(time, data);
@@ -188,7 +188,7 @@ function initializeChart(){
 function updateChart(){
   var [time, plantid, type] = getSelection();
 
-  d3.json(`/log/data/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
 
     setScales(time, data);
@@ -225,7 +225,7 @@ function updateChart(){
 
     // Update Select
     $.ajax({ type: "GET",
-        url: `/plant/data/${$('a#navbarDropdown').data("uid")}/uid`,
+        url: `/data/plant/${$('a#navbarDropdown').data("uid")}/uid`,
         async: true,
         success : function(plants){
           var str = "";
@@ -270,6 +270,15 @@ $(document).ready(function(){
   $('select#plant-select').on('change', function(event){
     updateChart();
     event.stopPropagation();
+    $.ajax({ type: "GET",
+        url: `/data/plant/${$(this).val()}/pid`,
+        async: true,
+        success : function(plant){
+          if(!plant.mc){
+            // $('button#register-plant').attr()
+          }
+        }
+      });
   });
 
   initializeChart();

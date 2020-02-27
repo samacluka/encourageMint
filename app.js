@@ -39,13 +39,15 @@ app.use(function(req,res,next){
 const indexRoutes         = require("./routes/index"),
       controllerRoutes    = require("./routes/controller"),
       authRoutes          = require("./routes/auth"),
-      configRoutes          = require("./routes/config");
+      configRoutes        = require("./routes/config");
+      dataRoutes          = require("./routes/data");
 
 //require routes
 app.use("/", indexRoutes);
 app.use("/controller",controllerRoutes);
 app.use("/auth",authRoutes);
 app.use("/config",configRoutes);
+app.use("/data",dataRoutes);
 
 /*=================================INIT - END=================================*/
 /*=================================LISTEN - BEGIN=============================*/

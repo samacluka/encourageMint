@@ -8,47 +8,134 @@
     <a href="#" class="badge badge-pill badge-light type-pill" data-type="soilMoisture">Soil Moisture</a>
     <a href="#" class="badge badge-pill badge-light type-pill" data-type="light">Light Intensity</a>
   </div>
-
   <div class="flex-cont-vert">
-
     <h3 id="title" for="plant-select">Temperature vs. Time</h3>
-
-    <select id="plant-select">
-      <% plants.forEach((plant, index) => { %>
-        <% if(index === 0){ %>
-          <option value="<%= plant.id %>" selected><%= plant.Name %></option>
+    <div class="from-group">
+      <select class="form-control" id="plant-select">
+        <% plants.forEach((plant, index) => { %>
+          <% if(index === 0){ %>
+            <option value="<%= plant.id %>" selected><%= plant.Name %></option>
           <% } else { %>
             <option value="<%= plant.id %>"><%= plant.Name %></option>
-            <% } %>
-            <% }) %>
-          </select>
-
-
-          <div class="svg">
-            <svg
-            version="1.1"
-            baseProfile="full"
-            xmlns="http://www.w3.org/2000/svg" >
-          </svg>
-        </div>
-
-        <div class="time-pills">
-          <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
-          <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
-        </div>
-
+          <% } %>
+        <% }) %>
+      </select>
+    </div>
+    <div class="svg">
+      <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="time-pills">
+      <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
+      <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
+    </div>
   </div>
-
   <div class="empty">
     <!-- empty div for flexbox spacing purposes -->
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="newPlantModal" tabindex="-1" role="dialog" aria-labelledby="newPlantModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newPlantModalTitle">New Plant</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="form-group row">
+            <label for="newPlantName" class="col-form-label col-3">Name:</label>
+            <input type="text" class="form-control col" id="newPlantName">
+          </div>
+          <div class="form-group row">
+            <label for="newPlantType" class="col-form-label col-3">Type:</label>
+            <select class="form-control col" name="plant-type" id="newPlantType">
+              <option value="Mint" slected>Mint</option>
+              <option value="Basil">Basil</option>
+            </select>
+          </div>
+          <hr class="style-two">
+          <div class="form-group row">
+            <label class="col-form-label col-6">Soil Mositure:</label>
+            <input type="text" class="form-control col-3" id="newSoilMoistureMin" placeholder="min">
+            <input type="text" class="form-control col-3" id="newSoilMoistureMax" placeholder="max">
+          </div>
+          <div class="form-group row">
+            <label class="col-form-label col-6">Light:</label>
+            <input type="text" class="form-control col-3" id="newLightMin" placeholder="min">
+            <input type="text" class="form-control col-3" id="newLightMax" placeholder="max">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="newPlantSubmit" data-dismiss="modal">Save New Plant</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="updatePlantModal" tabindex="-1" role="dialog" aria-labelledby="updatePlantModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updatePlantModalTitle">Update Plant</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="from-group row">
+            <select class="form-control" id="update-plant-select">
+              <% plants.forEach((plant, index) => { %>
+                <% if(index === 0){ %>
+                  <option value="<%= plant.id %>" selected><%= plant.Name %></option>
+                <% } else { %>
+                  <option value="<%= plant.id %>"><%= plant.Name %></option>
+                <% } %>
+              <% }) %>
+            </select>
+          </div>
+          <hr class="style-two">
+          <div class="form-group row">
+            <label for="updatePlantName" class="col-form-label col-3">Name:</label>
+            <input type="text" class="form-control col" id="updatePlantName">
+          </div>
+          <div class="form-group row">
+            <label for="updatePlantType" class="col-form-label col-3">Type:</label>
+            <select class="form-control col" name="plant-type" id="updatePlantType">
+              <option value="Mint">Mint</option>
+              <option value="Basil">Basil</option>
+            </select>
+          </div>
+          <hr class="style-two">
+          <div class="form-group row">
+            <label class="col-form-label col-6">Soil Mositure:</label>
+            <input type="text" class="form-control col-3" id="updateSoilMoistureMin" placeholder="min">
+            <input type="text" class="form-control col-3" id="updateSoilMoistureMax" placeholder="max">
+          </div>
+          <div class="form-group row">
+            <label class="col-form-label col-6">Light:</label>
+            <input type="text" class="form-control col-3" id="updateLightMin" placeholder="min">
+            <input type="text" class="form-control col-3" id="updateLightMax" placeholder="max">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="deletePlant" data-dismiss="modal">Delete Plant</button>
+        <button type="button" class="btn btn-primary" id="updatePlantSubmit" data-dismiss="modal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <%- include(views+'partials/footer'); %>

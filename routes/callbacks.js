@@ -24,17 +24,24 @@ var callbacks = {
   },
   index: {
       get: {
+        // landing
         // index
-        data: {
-
-        }
       },
       post: {
-        // register
+        // newPlant
       },
       put: {
 
+      },
+      delete: {
+
       }
+  },
+  data: {
+    get: {
+      // plant
+      // log
+    }
   },
   controller: {
     get: {
@@ -89,37 +96,11 @@ callbacks.index.get.index = function(req,res){
   });
 };
 
-callbacks.index.get.data.log = function(req,res){
-  var time = new Date();
-  time.setTime(time.getTime() - req.params.time * 60 * 60 * 1000);
-
-  // Find anything younger than one week
-  var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
-
-  Log.find(query).sort('created').exec((err, logs) => {
-    if (err) throw err;
-    res.send(logs);
-  });
-}
-
-callbacks.index.get.data.plant = function(req,res){
-  if(req.params.type === 'uid'){
-    var query = {Owner: req.params.id};
-  } else if(req.params.type === 'pid') {
-    var query = {_id: req.params.id};
-  }
-
-  Plant.find(query, (err, foundPlants) => {
-    if (err) throw err;
-    res.send(foundPlants);
-  });
-}
-
 // POST
 callbacks.index.post.newPlant = function(req, res){
   var PlantObj = {
-      Name: req.body.name,
-      Type: req.body.type,
+      Name: req.body.Name,
+      Type: req.body.Type,
       Owner: req.user._id,
       soilMoisture: {
         min: req.body.soilMoistureMin,
@@ -133,15 +114,16 @@ callbacks.index.post.newPlant = function(req, res){
 
   Plant.create(PlantObj, (err, newPlant) => {
           if(err) throw err;
-          res.render(views.index.index);
+          // res.render(views.index.index);
+          console.log(newPlant);
         });
 }
 
 // PUT
 callbacks.index.put.updatePlant = function(req, res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
-    foundPlant.Name = req.body.name;
-    foundPlant.Type = req.body.type;
+    foundPlant.Name = req.body.Name;
+    foundPlant.Type = req.body.Type;
     foundPlant.Owner = req.user._id;
     foundPlant.soilMoisture.min = req.body.soilMoistureMin;
     foundPlant.soilMoisture.max = req.body.soilMoistureMax;
@@ -149,9 +131,44 @@ callbacks.index.put.updatePlant = function(req, res){
     foundPlant.lightThreshold.max = req.body.lightThresholdMax;
 
     foundPlant.save().then((savedPlant) => {
-      console.log(savedPlant);
-      res.render(views.index.index);
+      res.send('success');
     }).catch((e) => {console.log(e);});
+  });
+}
+
+// DELETE
+callbacks.index.delete.plant = function(req, res){
+  Plant.deleteOne({_id: req.body.id}, function(err){
+    if(err) throw err;
+    res.send('success');
+  });
+}
+
+// ======================================== DATA ========================================
+// GET
+callbacks.data.get.log = function(req,res){
+  var time = new Date();
+  time.setTime(time.getTime() - req.params.time * 60 * 60 * 1000);
+
+  // Find anything younger than one week
+  var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
+
+  Log.find(query).sort('created').exec((err, logs) => {
+    if (err) throw err;
+    res.send(logs);
+  });
+}
+
+callbacks.data.get.plant = function(req,res){
+  if(req.params.type === 'uid'){
+    var query = {Owner: req.params.id};
+  } else if(req.params.type === 'pid') {
+    var query = {_id: req.params.id};
+  }
+
+  Plant.find(query, (err, foundPlants) => {
+    if (err) throw err;
+    res.send(foundPlants);
   });
 }
 
