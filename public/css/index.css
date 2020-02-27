@@ -91,3 +91,17 @@ hr.style-two {
 .tick:nth-child(2n) text {
     visibility: hidden;
 }
+
+div.modal input[placeholder='min']{
+  margin-right: 0.25em;
+}
+
+div.modal input[placeholder='max']{
+  margin-left: 0.25em;
+}
+
+div.modal hr{
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  opacity: 0.25;
+}
