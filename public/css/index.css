@@ -51,6 +51,7 @@ button#registerPlant{
 #plant-select{
   display: inline-block;
   text-align: center;
+  border-radius: 20px;
 }
 
 #title{
