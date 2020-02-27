@@ -10,6 +10,15 @@ body {
   color: white;
 }
 
+h1{
+  font-size: 750%;
+  text-shadow: 0px 0px 20px rgba(100, 100, 100, 1);
+}
+
+a:hover{
+  text-decoration: none;
+}
+
 .slideshow {
   position: fixed;
   width: 100%;
@@ -37,22 +46,22 @@ body {
 }
 
 .slideshow li:nth-child(1) {
-  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349267/encouragemint/landing/land2_huzn0v.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1582779157/encouragemint/landing/fomef_green_mint_5k-wallpaper-1920x1200_lwf2b5.jpg);
 }
 .slideshow li:nth-child(2) {
-  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land4_g97r8s.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1582778996/encouragemint/landing/water_lily_flower_close_up-wallpaper-1920x1200_e1fg6h.jpg);
   animation-delay: 10s;
 }
 .slideshow li:nth-child(3) {
-  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land3_p9fwdx.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1582778998/encouragemint/landing/beautiful_sunflower_5-wallpaper-1920x1200_ro8p3k.jpg);
   animation-delay: 20s;
 }
 .slideshow li:nth-child(4) {
-  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349266/encouragemint/landing/land1_a0hy34.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1582778949/encouragemint/landing/purple_dendrobium_orchids_flowers_outdoors-wallpaper-1920x1200_o5w8no.jpg);
   animation-delay: 30s;
 }
 .slideshow li:nth-child(5) {
-  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1581349264/encouragemint/landing/land5_caoaki.jpg);
+  background-image: url(https://res.cloudinary.com/dkvqve4ln/image/upload/v1582779046/encouragemint/landing/shutterstock_609086588-1200x784_tcbstg.jpg);
   animation-delay: 40s;
 }
 
