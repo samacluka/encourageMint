@@ -89,6 +89,7 @@ callbacks.index.get.landing = function(req,res){
 };
 
 callbacks.index.get.index = function(req,res){
+  console.log(req.clientIp);
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if (err) throw err;
     res.render(views.index.index, {plants: foundPlants});
@@ -182,13 +183,6 @@ callbacks.controller.get.setpoints = function(req,res){
       console.log("err: "+err);
       res.send("err: "+err);
     } else {
-      console.log("Name: " + foundPlant.Name);
-      console.log("Type: " + foundPlant.Type);
-      console.log("Soil Moisture Min Threshold: " + foundPlant.soilMoisture.min);
-      console.log("Soil Moisture Max Threshold: " + foundPlant.soilMoisture.max);
-      console.log("Light Max Threshold: " + foundPlant.lightThreshold.min);
-      console.log("Light Min Threshold: " + foundPlant.lightThreshold.max);
-
       res.send(JSON.stringify(foundPlant));
     }
   });
@@ -235,7 +229,6 @@ callbacks.controller.put.logs = function(req,res){
 
 // POST
 callbacks.config.post.new = function(req,res){
-  console.log(req.clientIp);
   var time = new Date();
   time.setTime(time.getTime() - 5 * 60 * 1000);
 
@@ -246,7 +239,7 @@ callbacks.config.post.new = function(req,res){
     if(err) throw err;
 
     if(!req.body.plant){ // From Microcontroller
-      var mcid = genUID();
+      var mcid = JSON.stringify({id: genUID()});
       if(foundConfig){ // Second to hit route
         console.log("Microcontroller was second to route");
         Plant.findById(foundConfig.plant, (err, foundPlant) => {
