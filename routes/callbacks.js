@@ -62,7 +62,6 @@ var callbacks = {
 // LOGOUT
 callbacks.auth.logout = function(req,res){
   req.logout();
-  req.flash("success","Successfully logged out!");
   res.redirect("/");
 };
 
@@ -160,10 +159,11 @@ callbacks.data.get.log = function(req,res){
 }
 
 callbacks.data.get.plant = function(req,res){
+  var query = {};
   if(req.params.type === 'uid'){
-    var query = {Owner: req.params.id};
+    query = {Owner: req.params.id};
   } else if(req.params.type === 'pid') {
-    var query = {_id: req.params.id};
+    query = {_id: req.params.id};
   }
 
   Plant.find(query, (err, foundPlants) => {
