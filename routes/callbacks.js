@@ -89,7 +89,7 @@ callbacks.index.get.landing = function(req,res){
 };
 
 callbacks.index.get.index = function(req,res){
-  console.log(req.clientIp);
+  console.log('================ '+req.clientIp+' ================');
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if (err) throw err;
     res.render(views.index.index, {plants: foundPlants});
