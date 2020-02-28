@@ -18,13 +18,32 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="modal" data-target="#newPlantModal">New Plant</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="modal" data-target="#updatePlantModal">Update Plant</a>
           </li>
+        </ul>
+
+        <ul class="navbar-nav mx-auto">
+          <div class="plantSelect-registerButton">
+            <div class="from-group">
+              <select class="form-control" id="plant-select">
+                <% if(plants){ %>
+                  <% plants.forEach((plant, index) => { %>
+                    <% if(index === 0){ %>
+                      <option value="<%= plant.id %>" selected><%= plant.Name %></option>
+                    <% } else { %>
+                      <option value="<%= plant.id %>"><%= plant.Name %></option>
+                    <% } %>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+            <button type="button" id="registerPlant" class="btn btn-warning">Connect Plant</button>
+          </div>
         </ul>
 
         <ul class="navbar-nav">
@@ -78,23 +97,7 @@
           <a href="#" class="badge badge-pill badge-light type-pill" data-type="light">Light Intensity</a>
         </div>
         <div class="flex-cont-vert">
-          <h3 id="title" for="plant-select">Temperature vs. Time</h3>
-          <div class="plantSelect-registerButton">
-            <div class="from-group">
-              <select class="form-control" id="plant-select">
-                <% if(plants){ %>
-                  <% plants.forEach((plant, index) => { %>
-                    <% if(index === 0){ %>
-                      <option value="<%= plant.id %>" selected><%= plant.Name %></option>
-                    <% } else { %>
-                      <option value="<%= plant.id %>"><%= plant.Name %></option>
-                    <% } %>
-                  <% }) %>
-                <% } %>
-              </select>
-            </div>
-            <button type="button" id="registerPlant" class="btn btn-warning">Connect Plant</button>
-          </div>
+          <!-- <h3 id="title" for="plant-select">Temperature vs. Time</h3> -->
           <div class="svg">
             <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"></svg>
           </div>
