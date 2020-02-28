@@ -7,7 +7,8 @@ const mongoose        = require('mongoose');
 const User            = require(rootDir+"models/user.js"),
       Plant           = require(rootDir+"models/plant.js"),
       Log             = require(rootDir+"models/log.js"),
-      Config          = require(rootDir+"models/config.js");
+      Config          = require(rootDir+"models/config.js"),
+      Message         = require(rootDir+"models/message.js");
 
 const views           = require(rootDir+"views/views.js");
 
@@ -31,21 +32,28 @@ var callbacks = {
         // newPlant
       },
       put: {
-
+        // updatePlant
       },
       delete: {
-
+        // deletePlant
       }
   },
   data: {
     get: {
       // plant
       // log
+      // message
+    },
+    delete: {
+      // message
     }
   },
   controller: {
     get: {
       // setpoints
+    },
+    post: {
+      // message
     },
     put: {
       // logs
@@ -92,7 +100,9 @@ callbacks.index.get.index = function(req,res){
   console.log('================ '+req.clientIp+' ================');
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if (err) throw err;
-    res.render(views.index.index, {plants: foundPlants});
+    Message.find({plant: foundPlants[0]._id}, (err, foundMessages) => {
+      res.render(views.index.index, {plants: foundPlants, messages: foundMessages});
+    });
   });
 };
 
@@ -173,6 +183,35 @@ callbacks.data.get.plant = function(req,res){
   });
 }
 
+callbacks.data.get.message = function(req,res){
+  var query = {};
+  if(req.params.type === 'uid'){
+    query = {owner: req.params.id};
+  } else if(req.params.type === 'pid') {
+    query = {plant: req.params.id};
+  }
+
+  Message.find(query, (err, foundMessages) => {
+    if(err) throw err;
+    res.send(foundMessages);
+  });
+}
+
+// DELETE
+callbacks.data.delete.message = function(req,res){
+  var query = {};
+  if(req.params.type === 'uid'){
+    query = {owner: req.params.id};
+  } else if(req.params.type === 'pid') {
+    query = {_id: req.params.id};
+  }
+
+  Message.deleteOne(query, (err) => {
+    if(err) throw err;
+    res.end();
+  });
+}
+
 // ======================================== CONTROLLER ========================================
 // GET
 callbacks.controller.get.setpoints = function(req,res){
@@ -187,6 +226,31 @@ callbacks.controller.get.setpoints = function(req,res){
     }
   });
 };
+
+// POST
+callbacks.controller.post.message = function(req,res){
+  try {
+    var mesObj = {
+      plant: req.body.plantid,
+      message: req.body.message,
+      type: req.body.type
+    }
+
+    var time = new Date();
+    time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago
+    //Delete any logs older than a week
+    Message.deleteMany({created: {$lt: time}}, (err) => {
+      if(err) throw err;
+      Message.create(mesObj, (err, newMessage) => {
+        if(err) throw err
+        res.end();
+      });
+    });
+
+  } catch (e) {
+    res.send(e);
+  }
+}
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
@@ -204,24 +268,15 @@ callbacks.controller.put.logs = function(req,res){
     time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago
     //Delete any logs older than a week
     Log.deleteMany({created: {$lt: time}}, (err) => {
-      if(err){
-        console.log(err);
-        res.send(err);
-      } else {
-        Log.create(logObj,(err, newLog) => {
-          if(err){
-            console.log(err);
-            res.send(err);
-          } else {
-            res.send("successfully logged");
-          }
-        });
-      }
+      if(err) throw err;
+      Log.create(logObj,(err, newLog) => {
+        if(err) throw err
+        res.end();
+      });
     });
 
   } catch (e) {
     res.send(e);
-
   }
 };
 

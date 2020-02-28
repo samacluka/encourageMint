@@ -22,10 +22,6 @@ var lineWidth = 4;
 
 var data;
 
-function capitalize(str){
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 function color(type){
   switch(type) {
     case "temperature":
@@ -304,10 +300,45 @@ $(document).ready(function(){
           }
         }
       });
+    $.ajax({ type: "GET",
+        url: `/data/message/${$(this).val()}/pid`,
+        async: true,
+        success : function(messages){
+          $('div.alert').each(function(i){
+            $(this).remove();
+          });
+
+          var str = "";
+          messages.forEach((message, index) => {
+            str +=
+            `
+            <div class="alert alert-${ message.type } alert-dismissible fade show" role="alert" data-id="${ message._id }">
+              ${ message.message }
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            `
+          });
+          $('div.messages > div.container').append(str);
+
+        }
+      });
   });
+
   $('button#registerPlant').on('click', function(event){
     $.post( "/config/new", { plant: $('select#plant-select').val() });
     $(this).hide({duration: 400});
+  });
+
+  $('div.alert button.close').on('click', function(){
+    $.ajax({ type: 'DELETE',
+             url: `/data/message/${$(this).parent().data('id')}/pid`,
+             async: true,
+             success : function(messages){
+               console.log('successfully deleted');
+             }
+    });
   });
 
   initializeChart();

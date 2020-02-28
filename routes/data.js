@@ -3,9 +3,12 @@ const express = require("express"),
 
 const callbacks       = require("./callbacks.js");
 
-const is              = require("../middleware/is.js");
-
+// GET
 router.get("/log/:id/:time", callbacks.data.get.log);
 router.get("/plant/:id/:type", callbacks.data.get.plant);
+router.get("/message/:id/:type", callbacks.data.get.message);
+
+// DELETE
+router.delete("/message/:id/:type", callbacks.data.delete.message);
 
 module.exports = router;
