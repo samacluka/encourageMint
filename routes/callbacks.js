@@ -150,7 +150,7 @@ callbacks.index.put.updatePlant = function(req, res){
 callbacks.index.delete.plant = function(req, res){
   Plant.deleteOne({_id: req.body.id}, function(err){
     if(err) throw err;
-    res.send('success');
+    res.end();
   });
 }
 

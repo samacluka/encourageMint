@@ -40,13 +40,13 @@ function color(type){
 function getTitle(type){
   switch(type) {
     case "temperature":
-      return 'Temperature';
+      return 'Temperature vs. Time';
     case "humidity":
-      return 'Humidity';
+      return 'Humidity vs. Time';
     case "soilMoisture":
-      return 'Soil Moisture';
+      return 'Soil Moisture vs. Time';
     case "light":
-      return 'Light';
+      return 'Light vs. Time';
     default:
       return 'Data';
   }
@@ -133,6 +133,26 @@ function getSelection(){
   return [time, plantid, type];
 }
 
+function updatePlantSelect(plantid){
+  $.ajax({ type: "GET",
+      url: `/data/plant/${$('a#navbarDropdown').data("uid")}/uid`,
+      async: true,
+      success : function(plants){
+        var str = "";
+
+        plants.forEach((plant, index) => {
+          if(plantid === plant._id){
+            str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
+          } else {
+            str += `<option value="${plant._id}">${plant.Name}</option>`;
+          }
+        });
+
+        $('select#plant-select').html(str);
+      }
+    });
+}
+
 function initializeChart(){
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
@@ -175,6 +195,14 @@ function initializeChart(){
                 .y(function(d){ return yScale(d.desired); })
               );
 
+    // Set title
+    title = svg
+              .append('text')
+                .attr('id','title')
+                .attr('x', width / 2)
+                .attr('y', padding / 2)
+                .style('text-anchor','middle')
+                .text(getTitle(type));
 
     // Set X axis label
     xAxisLabel = svg
@@ -237,27 +265,12 @@ function updateChart(){
           .y(function(d){ return yScale(d.desired); })
         );
 
-    // Update Title
-    $("#title").text(`${getTitle(type)} vs. Time`); // Update title
-
     // Update Select
-    $.ajax({ type: "GET",
-        url: `/data/plant/${$('a#navbarDropdown').data("uid")}/uid`,
-        async: true,
-        success : function(plants){
-          var str = "";
+    updatePlantSelect(plantid);
 
-          plants.forEach((plant, index) => {
-            if(plantid === plant._id){
-              str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
-            } else {
-              str += `<option value="${plant._id}">${plant.Name}</option>`;
-            }
-          });
-
-          $('select#plant-select').html(str);
-        }
-      });
+    // Update Title
+    title
+      .text(getTitle(type));
 
       // Update X
     xAxisLabel
@@ -270,6 +283,7 @@ function updateChart(){
 }
 
 function selectPill(event){
+  event.preventDefault(); // Prevent scrolling up on data change
   $(`div.${event.data.str}-pills a.selected`).addClass('badge-light');
   $(`div.${event.data.str}-pills a.selected`).removeClass('badge-dark');
   $(`div.${event.data.str}-pills a.selected`).removeClass('selected');
@@ -339,6 +353,12 @@ $(document).ready(function(){
                console.log('successfully deleted');
              }
     });
+  });
+
+  $('.modal').on('hide.bs.modal', function(){
+    var [time, plantid, type] = getSelection();
+    if(!plantid) return;
+    updatePlantSelect(plantid);
   });
 
   initializeChart();
