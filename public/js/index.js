@@ -1,3 +1,7 @@
+// const height = $(window).height()*0.7;
+// const width = $(window).width()*0.8;
+// const padding = (50 / 600) * width / 1.2;
+
 var height = 600;
 var width = 1200;
 var padding = 50;
