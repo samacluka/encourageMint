@@ -14,6 +14,7 @@ function postNewPlant(){
         });
 }
 
+// Performs slowly bc of nested ajax and .done
 function updatePlantForm(from){
   var usePlant;
   if(from === 'modalLoad'){
@@ -48,7 +49,7 @@ function updatePlantForm(from){
           $('input#updateLightMax').val(data.lightThreshold.max);
       });
   });
-} // Performs slowly bc of nested ajax and .done
+}
 
 function updatePlant(){
   $.ajax({
