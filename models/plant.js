@@ -8,7 +8,6 @@ var plantSchema = new mongoose.Schema({
   Type: String,
   mc: String,
   Owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  Logs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Log' }],
   soilMoisture: {
     max: Number,
     min: Number
