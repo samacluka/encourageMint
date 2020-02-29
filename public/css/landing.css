@@ -97,37 +97,6 @@ h5 {
   animation: 2s linear 5s 1 forwards zoomIn;
 }
 
-@keyframes floatIn{
-  0% {
-    opacity: 0;
-    margin-top: 40px;
-  }
-  100%{
-    opacity: 1;
-    margin-top: : 20px;
-  }
-}
-
-@keyframes stretch{
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  30% {
-    opacity: 1;
-    letter-spacing: 12px;
-  }
-  85% {
-    opacity: 1;
-    letter-spacing: 3px;
-  }
-  100%{
-    opacity: 1;
-  }
-}
-
 @keyframes zoomIn{
   0% {
     opacity: 0;
