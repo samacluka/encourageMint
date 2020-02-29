@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var User = require('./plant.js');
 
 var defaultSchema = new mongoose.Schema({
-  Type: String,
+  type: String,
   soilMoisture: {
     max: Number,
     min: Number

@@ -8,7 +8,8 @@ const User            = require(rootDir+"models/user.js"),
       Plant           = require(rootDir+"models/plant.js"),
       Log             = require(rootDir+"models/log.js"),
       Config          = require(rootDir+"models/config.js"),
-      Message         = require(rootDir+"models/message.js");
+      Message         = require(rootDir+"models/message.js"),
+      Default         = require(rootDir+'models/default.js');
 
 const views           = require(rootDir+"views/views.js");
 
@@ -197,6 +198,15 @@ callbacks.data.get.message = function(req,res){
   Message.find(query, (err, foundMessages) => {
     if(err) throw err;
     res.send(foundMessages);
+  });
+}
+
+callbacks.data.get.default = function(req,res){
+  var query = {type: req.params.type};
+
+  Default.find(query, (err, foundDefault) => {
+    if(err) throw err;
+    res.send(foundDefault);
   });
 }
 

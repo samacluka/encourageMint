@@ -80,10 +80,32 @@ function deletePlant(){
   $('select#update-plant-select').prop('selectedIndex',0);
 }
 
+function loadDefault(event){
+  console.log($(this).val());
+  $.get(`/data/default/${$(this).val()}`)
+   .done(function( data ){
+     [data] = data; // removed array wrapper
+     if(!data) return;
+     if(event.data.from === 'new'){
+       $('select#newPlantType').parent().siblings('div.form-group.row').children('input#newSoilMoistureMax').val(data.soilMoisture.max);
+       $('select#newPlantType').parent().siblings('div.form-group.row').children('input#newSoilMoistureMin').val(data.soilMoisture.min);
+       $('select#newPlantType').parent().siblings('div.form-group.row').children('input#newLightMax').val(data.lightThreshold.max);
+       $('select#newPlantType').parent().siblings('div.form-group.row').children('input#newLightMin').val(data.lightThreshold.min);
+     } else {
+       $('select#updatePlantType').parent().siblings('div.form-group.row').children('input#updateSoilMoistureMax').val(data.soilMoisture.max);
+       $('select#updatePlantType').parent().siblings('div.form-group.row').children('input#updateSoilMoistureMin').val(data.soilMoisture.min);
+       $('select#updatePlantType').parent().siblings('div.form-group.row').children('input#updateLightMax').val(data.lightThreshold.max);
+       $('select#updatePlantType').parent().siblings('div.form-group.row').children('input#updateLightMin').val(data.lightThreshold.min);
+     }
+  });
+}
+
 $(document).ready(function(){
     $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
     $('#updatePlantModal').on('show.bs.modal', {from: 'show'}, updatePlantForm);
     $('#update-plant-select').on('change', {from: 'update'}, updatePlantForm);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);
+    $('#newPlantType').on('change', {from: 'new'}, loadDefault);
+    $('#updatePlantType').on('change', {from: 'update'}, loadDefault);
 });
