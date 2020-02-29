@@ -89,6 +89,7 @@ function getTimeFormat(time){
 }
 
 function formatData(type, Data){
+  if(!Data) return Data;
   Data.forEach(function(d,i){
     d.created = new Date(d.created).getTime();
 
@@ -159,6 +160,7 @@ function initializeChart(){
 
   d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
+    if(!data) return;
 
     setScales(time, data);
 
@@ -235,6 +237,7 @@ function updateChart(){
 
   d3.json(`/data/log/${plantid}/${time}`, function(Data){
     data = formatData(type, Data);
+    if(!data) return;
 
     setScales(time, data);
 
