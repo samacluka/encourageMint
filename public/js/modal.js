@@ -14,15 +14,13 @@ function postNewPlant(){
         });
 }
 
-// Performs slowly bc of nested ajax and .done
-function updatePlantForm(from){
+function updatePlantForm(event){
   var usePlant;
-  if(from === 'modalLoad'){
+  if(event.data.from === 'show'){
     usePlant = $('select#plant-select option:selected').val();
   } else {
     usePlant = $('select#update-plant-select option:selected').val();
   }
-
 
   $.get(`/data/plant/${$('a#navbarDropdown').data("uid")}/uid`)
    .done(function( plants ){
@@ -37,17 +35,17 @@ function updatePlantForm(from){
       });
 
       $('select#update-plant-select').html(str);
+  });
 
-      $.get(`/data/plant/${$('select#update-plant-select option:selected').val()}/pid`)
-       .done(function( data ) {
-          [data] = data; // remove array wrapping
-          $('input#updatePlantName').val(data.Name);
-          $('select#updatePlantType').val(data.Type);
-          $('input#updateSoilMoistureMin').val(data.soilMoisture.min);
-          $('input#updateSoilMoistureMax').val(data.soilMoisture.max);
-          $('input#updateLightMin').val(data.lightThreshold.min);
-          $('input#updateLightMax').val(data.lightThreshold.max);
-      });
+  $.get(`/data/plant/${ usePlant }/pid`)
+   .done(function( data ) {
+      [data] = data; // remove array wrapping
+      $('input#updatePlantName').val(data.Name);
+      $('select#updatePlantType').val(data.Type);
+      $('input#updateSoilMoistureMin').val(data.soilMoisture.min);
+      $('input#updateSoilMoistureMax').val(data.soilMoisture.max);
+      $('input#updateLightMin').val(data.lightThreshold.min);
+      $('input#updateLightMax').val(data.lightThreshold.max);
   });
 }
 
@@ -66,7 +64,6 @@ function updatePlant(){
             lightThresholdMax: $('input#updateLightMax').val()
           },
     success: function(result) {
-        console.log(result);
     }
   });
 }
@@ -75,7 +72,9 @@ function deletePlant(){
   $.ajax({
     url: '/deletePlant',
     type: 'DELETE',
-    data: { id: $('select#update-plant-select option:selected').val() }
+    data: { id: $('select#update-plant-select option:selected').val() },
+    success: function(){
+    }
   });
 
   $('select#update-plant-select').prop('selectedIndex',0);
@@ -83,8 +82,8 @@ function deletePlant(){
 
 $(document).ready(function(){
     $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
-    $('#updatePlantModal').on('show.bs.modal', {from: 'modalLoad'}, updatePlantForm);
-    $('#update-plant-select').on('change', updatePlantForm);
+    $('#updatePlantModal').on('show.bs.modal', {from: 'show'}, updatePlantForm);
+    $('#update-plant-select').on('change', {from: 'update'}, updatePlantForm);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);
 });

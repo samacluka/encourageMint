@@ -124,8 +124,7 @@ callbacks.index.post.newPlant = function(req, res){
 
   Plant.create(PlantObj, (err, newPlant) => {
           if(err) throw err;
-          // res.render(views.index.index);
-          console.log(newPlant);
+          res.end();
         });
 }
 
@@ -140,9 +139,13 @@ callbacks.index.put.updatePlant = function(req, res){
     foundPlant.lightThreshold.min = req.body.lightThresholdMin;
     foundPlant.lightThreshold.max = req.body.lightThresholdMax;
 
-    foundPlant.save().then((savedPlant) => {
-      res.send('success');
-    }).catch((e) => {console.log(e);});
+    foundPlant.save()
+                .then((savedPlant) => {
+                  res.end();
+                }).catch((e) => {
+                  console.log(e);
+                  res.end();
+                });
   });
 }
 
