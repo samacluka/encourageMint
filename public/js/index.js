@@ -1,10 +1,6 @@
-// const height = $(window).height()*0.7;
-// const width = $(window).width()*0.8;
-// const padding = (50 / 600) * width / 1.2;
-
-var height = 650;
-var width = 1200;
-var padding = 50;
+var height; // 650
+var width; // 1200
+var padding; // 50
 
 var yScale;
 var xScale;
@@ -21,6 +17,15 @@ var line;
 var lineWidth = 4;
 
 var data;
+
+function buildSVG(){
+  height = $(window).height()*0.75;
+  width = $(window).width()*0.8;
+  padding = (50 / 650) * width;
+
+  if(svg) svg.remove();
+  initializeChart();
+}
 
 function color(type){
   switch(type) {
@@ -163,6 +168,12 @@ function initializeChart(){
     if(!data) return;
 
     setScales(time, data);
+
+    d3.select('div.svg')
+      .append('svg')
+        .attr('version',1.1)
+        .attr('baseProfile', 'full')
+        .attr('xmlns', 'http://www.w3.org/2000/svg');
 
     svg = d3.select('svg')
               .attr('width', width)
@@ -376,6 +387,9 @@ $(document).ready(function(){
 
   loadAlerts();
 
-  initializeChart();
+  var debBuildSVG = _.debounce(buildSVG, 300);
+  $(window).on('resize', debBuildSVG);
+
+  buildSVG();
   setInterval(updateChart, 30 * 1000);
 });
