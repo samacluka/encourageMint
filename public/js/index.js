@@ -322,7 +322,7 @@ function loadAlerts(){
           str +=
           `
           <div class="alert alert-${ message.type } alert-dismissible fade show" role="alert" data-id="${ message._id }">
-            <span>${ date.getDate() }/${ date.getMonth() }/${ date.getFullYear() }:</span>
+            <small>${ date.getDate() }/${ date.getMonth() }/${ date.getFullYear() }:</small>
             <span>${ message.message }</span>
             <div class="alertButtons">
               <button type="button" class="close mr-4 px-2" data-dismiss="alert" aria-label="Close">

@@ -109,6 +109,7 @@ div.modal hr{
 div.alert{
   display: flex;
   justify-content: space-between;
+  align-content: center;
 }
 
 /* Remove scrollbar */
