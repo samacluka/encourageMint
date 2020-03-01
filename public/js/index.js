@@ -2,7 +2,7 @@
 // const width = $(window).width()*0.8;
 // const padding = (50 / 600) * width / 1.2;
 
-var height = 600;
+var height = 650;
 var width = 1200;
 var padding = 50;
 
@@ -296,6 +296,39 @@ function selectPill(event){
   updateChart();
 }
 
+function loadAlerts(){
+  $.ajax({ type: "GET",
+      url: `/data/message/${$('select#plant-select').val()}/pid`,
+      async: true,
+      success : function(messages){
+        $('div.alert').each(function(i){
+          $(this).remove();
+        });
+
+        var str = "";
+        messages.forEach((message, index) => {
+          date = new Date(message.created);
+          str +=
+          `
+          <div class="alert alert-${ message.type } alert-dismissible fade show" role="alert" data-id="${ message._id }">
+            <span>${ date.getDate() }/${ date.getMonth() }/${ date.getFullYear() }:</span>
+            <span>${ message.message }</span>
+            <div class="alertButtons">
+              <button type="button" class="close mr-4 px-2" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&minus;</span>
+              </button>
+              <button type="button" class="close delete px-2" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+          `
+        });
+        $('div.messages > div.container').append(str);
+      }
+    });
+}
+
 $(document).ready(function(){
   $('div.empty').width($('div.type-pills').width()); // to center the svg
 
@@ -317,30 +350,7 @@ $(document).ready(function(){
           }
         }
       });
-    $.ajax({ type: "GET",
-        url: `/data/message/${$(this).val()}/pid`,
-        async: true,
-        success : function(messages){
-          $('div.alert').each(function(i){
-            $(this).remove();
-          });
-
-          var str = "";
-          messages.forEach((message, index) => {
-            str +=
-            `
-            <div class="alert alert-${ message.type } alert-dismissible fade show" role="alert" data-id="${ message._id }">
-              ${ message.message }
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            `
-          });
-          $('div.messages > div.container').append(str);
-
-        }
-      });
+    loadAlerts();
   });
 
   $('button#registerPlant').on('click', function(event){
@@ -348,7 +358,7 @@ $(document).ready(function(){
     $(this).hide({duration: 400});
   });
 
-  $('div.alert button.close').on('click', function(){
+  $('div.alert button.delete').on('click', function(){
     $.ajax({ type: 'DELETE',
              url: `/data/message/${$(this).parent().data('id')}/pid`,
              async: true,
@@ -363,6 +373,8 @@ $(document).ready(function(){
     if(!plantid) return;
     updatePlantSelect(plantid);
   });
+
+  loadAlerts();
 
   initializeChart();
   setInterval(updateChart, 30 * 1000);
