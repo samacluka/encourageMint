@@ -21,7 +21,7 @@ div.time-pills{
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 65%
+  width: 65%;
 }
 
 div.plantSelect-registerButton{
@@ -30,11 +30,8 @@ div.plantSelect-registerButton{
   justify-content: space-between;
 }
 
-a.type-pill{
-  margin: 3px;
-}
-
 a.badge{
+  margin: 3px;
   font-size: 100%;
 }
 
@@ -127,15 +124,22 @@ div.alert{
     margin: 20px;
   }
 
-  div.flex-cont-vert{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
   div.type-pills{
     display: flex;
     flex-direction: row;
     margin-bottom: 10px;
+  }
+}
+
+
+@media only screen and (max-width: 450px) {
+  div.type-pills{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  div.time-pills{
+    display: flex;
+    flex-direction: column;
   }
 }
