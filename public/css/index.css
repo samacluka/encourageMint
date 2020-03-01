@@ -116,3 +116,25 @@ div.alert{
     width: 0px;  /* Remove scrollbar space */
     background: transparent;  /* Optional: just make scrollbar invisible */
 }
+
+@media only screen and (max-width: 987px) {
+  div.flex-cont{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px;
+  }
+
+  div.flex-cont-vert{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  div.type-pills{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+}
