@@ -14,6 +14,37 @@ function postNewPlant(){
         });
 }
 
+function updatePlant(){
+  $.ajax({
+    url: '/updatePlant',
+    type: 'PUT',
+    data: {
+            plantid: $('select#update-plant-select').val(),
+            Name: $('input#updatePlantName').val(),
+            Type: $('select#updatePlantType').val(),
+            Owner: $('a#navbarDropdown').data("uid"),
+            soilMoistureMin: $('input#updateSoilMoistureMin').val(),
+            soilMoistureMax: $('input#updateSoilMoistureMax').val(),
+            lightThresholdMin: $('input#updateLightMin').val(),
+            lightThresholdMax: $('input#updateLightMax').val()
+          },
+    success: function(result) {
+    }
+  });
+}
+
+function deletePlant(){
+  $.ajax({
+    url: '/deletePlant',
+    type: 'DELETE',
+    data: { id: $('select#update-plant-select option:selected').val() },
+    success: function(){
+    }
+  });
+
+  $('select#update-plant-select').prop('selectedIndex',0);
+}
+
 function updatePlantForm(event){
   var usePlant;
   if(event.data.from === 'show'){
@@ -49,57 +80,30 @@ function updatePlantForm(event){
   });
 }
 
-function updatePlant(){
-  $.ajax({
-    url: '/updatePlant',
-    type: 'PUT',
-    data: {
-            plantid: $('select#update-plant-select').val(),
-            Name: $('input#updatePlantName').val(),
-            Type: $('select#updatePlantType').val(),
-            Owner: $('a#navbarDropdown').data("uid"),
-            soilMoistureMin: $('input#updateSoilMoistureMin').val(),
-            soilMoistureMax: $('input#updateSoilMoistureMax').val(),
-            lightThresholdMin: $('input#updateLightMin').val(),
-            lightThresholdMax: $('input#updateLightMax').val()
-          },
-    success: function(result) {
-    }
-  });
-}
-
-function deletePlant(){
-  $.ajax({
-    url: '/deletePlant',
-    type: 'DELETE',
-    data: { id: $('select#update-plant-select option:selected').val() },
-    success: function(){
-    }
-  });
-
-  $('select#update-plant-select').prop('selectedIndex',0);
-}
-
 function loadDefault(event){
-  console.log($(this).val());
-  $.get(`/data/default/${$(this).val()}`)
+  var from = event.data.from;
+  
+  $.get(`/data/default/${$(`select#${from}PlantType`).val()}`)
    .done(function( data ){
      [data] = data; // removed array wrapper
      if(!data) return;
-     
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}SoilMoistureMax`).val(data.soilMoisture.max);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}SoilMoistureMin`).val(data.soilMoisture.min);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}LightMax`).val(data.lightThreshold.max);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}LightMin`).val(data.lightThreshold.min);
+
+     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMax`).val(data.soilMoisture.max);
+     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMin`).val(data.soilMoisture.min);
+     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMax`).val(data.lightThreshold.max);
+     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMin`).val(data.lightThreshold.min);
   });
 }
 
 $(document).ready(function(){
     $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
-    $('#updatePlantModal').on('show.bs.modal', {from: 'show'}, updatePlantForm);
-    $('#update-plant-select').on('change', {from: 'update'}, updatePlantForm);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);
+
+    $('#updatePlantModal').on('show.bs.modal', {from: 'show'}, updatePlantForm);
+    $('#update-plant-select').on('change', {from: 'update'}, updatePlantForm);
+
+    $('#newPlantModal').on('show.bs.modal', {from: 'new'}, loadDefault);
     $('#newPlantType').on('change', {from: 'new'}, loadDefault);
     $('#updatePlantType').on('change', {from: 'update'}, loadDefault);
 });
