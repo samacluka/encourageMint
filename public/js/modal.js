@@ -82,23 +82,16 @@ function updatePlantForm(event){
 
 function loadDefault(event){
   var from = event.data.from;
-  
+
   $.get(`/data/default/${$(`select#${from}PlantType`).val()}`)
    .done(function( data ){
      [data] = data; // removed array wrapper
      if(!data) return;
 
-<<<<<<< HEAD
      $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMax`).val(data.soilMoisture.max);
      $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMin`).val(data.soilMoisture.min);
      $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMax`).val(data.lightThreshold.max);
      $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMin`).val(data.lightThreshold.min);
-=======
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}SoilMoistureMax`).val(data.soilMoisture.max);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}SoilMoistureMin`).val(data.soilMoisture.min);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}LightMax`).val(data.lightThreshold.max);
-     $(`select#${event.data.from}PlantType`).parent().siblings('div.form-group.row').children(`input#${event.data.from}LightMin`).val(data.lightThreshold.min);
->>>>>>> 0c880907c0c4a2b646676d753adbc1e4fe819aab
   });
 }
 

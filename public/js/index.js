@@ -123,7 +123,8 @@ function setScales(time, Data){
   var prev = now - parseInt(time) * 60 * 60 * 1000;
 
   yScale = d3.scaleLinear()
-               .domain(d3.extent(Data, d => d.desired))
+               // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
+               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+10/(a[1]-a[0]) : x-10/(a[1]-a[0])))  // Add padding to data range inversely purportional to original range
                .range([height - padding, padding]);
 
   xScale = d3.scaleTime()
