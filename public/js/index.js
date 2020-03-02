@@ -336,7 +336,7 @@ function loadAlerts(){
           </div>
           `
         });
-        
+
         $('div.messages > div.container').append(str);
 
         $('div.alert button.delete').on('click', function(){
@@ -392,5 +392,7 @@ $(document).ready(function(){
 
   loadAlerts();
   buildSVG();
+  
   setInterval(updateChart, 30 * 1000);
+  setInterval(loadAlerts, 30 * 1000);
 });
