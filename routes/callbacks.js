@@ -212,12 +212,7 @@ callbacks.data.get.default = function(req,res){
 
 // DELETE
 callbacks.data.delete.message = function(req,res){
-  var query = {};
-  if(req.params.type === 'uid'){
-    query = {owner: req.params.id};
-  } else if(req.params.type === 'pid') {
-    query = {_id: req.params.id};
-  }
+  var query = {_id: req.params.id};
 
   Message.deleteOne(query, (err) => {
     if(err) throw err;

@@ -10,6 +10,6 @@ router.get("/message/:id/:type", callbacks.data.get.message);
 router.get("/default/:type", callbacks.data.get.default);
 
 // DELETE
-router.delete("/message/:id/:type", callbacks.data.delete.message);
+router.delete("/message/:id", callbacks.data.delete.message);
 
 module.exports = router;

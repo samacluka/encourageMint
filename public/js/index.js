@@ -336,7 +336,18 @@ function loadAlerts(){
           </div>
           `
         });
+        
         $('div.messages > div.container').append(str);
+
+        $('div.alert button.delete').on('click', function(){
+          $.ajax({ type: 'DELETE',
+                   url: `/data/message/${$(this).parent().parent().data('id')}`,
+                   async: true,
+                   success : function(){
+                     console.log('successfully deleted');
+                   }
+          });
+        });
       }
     });
 }
@@ -370,27 +381,16 @@ $(document).ready(function(){
     $(this).hide({duration: 400});
   });
 
-  $('div.alert button.delete').on('click', function(){
-    $.ajax({ type: 'DELETE',
-             url: `/data/message/${$(this).parent().data('id')}/pid`,
-             async: true,
-             success : function(messages){
-               console.log('successfully deleted');
-             }
-    });
-  });
-
   $('.modal').on('hide.bs.modal', function(){
     var [time, plantid, type] = getSelection();
     if(!plantid) return;
     updatePlantSelect(plantid);
   });
 
-  loadAlerts();
-
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);
 
+  loadAlerts();
   buildSVG();
   setInterval(updateChart, 30 * 1000);
 });
