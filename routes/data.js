@@ -9,6 +9,9 @@ router.get("/plant/:id/:type", callbacks.data.get.plant);
 router.get("/message/:id/:type", callbacks.data.get.message);
 router.get("/default/:type", callbacks.data.get.default);
 
+// PUT
+router.put("/notifications", callbacks.data.put.notifications);
+
 // DELETE
 router.delete("/message/:id", callbacks.data.delete.message);
 

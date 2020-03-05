@@ -15,6 +15,8 @@ const views           = require(rootDir+"views/views.js");
 
 const genUID          = require(rootDir+"helpers/UID.js");
 
+const sendmail        = require(rootDir+"emails/nodemailer.js");
+
 var callbacks = {
   auth: {
     // logout
@@ -44,6 +46,9 @@ var callbacks = {
       // plant
       // log
       // message
+    },
+    put: {
+
     },
     delete: {
       // message
@@ -76,7 +81,7 @@ callbacks.auth.logout = function(req,res){
 
 //GOOGLE
 callbacks.auth.google.index = passport.authenticate('google', {
-  scope: ['profile']
+  scope: ['profile','email']
 });
 
 callbacks.auth.google.callback = passport.authenticate('google', {
@@ -210,6 +215,21 @@ callbacks.data.get.default = function(req,res){
   });
 }
 
+// PUT
+callbacks.data.put.notifications = function(req,res){
+  User.findById(req.body.user, (err, foundUser) => {
+    if(err) throw err;
+    foundUser.notifications = req.body.checked;
+    foundUser.save()
+                .then((savedUser) => {
+                  res.end();
+                }).catch((e) => {
+                  console.log(e);
+                  res.end();
+                });
+  });
+}
+
 // DELETE
 callbacks.data.delete.message = function(req,res){
   var query = {_id: req.params.id};
@@ -243,6 +263,13 @@ callbacks.controller.post.message = function(req,res){
       message: req.body.message,
       type: req.body.type
     }
+    Plant.findOne({_id: req.body.plantid}, (err, foundPlant) => {
+      User.findOne({_id: foundPlant.Owner}, (err, foundUser) => {
+        if(foundUser.notifications){
+          sendmail(foundPlant.Name, req.body.message, foundUser.email);
+        }
+      });
+    });
 
     var time = new Date();
     time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago

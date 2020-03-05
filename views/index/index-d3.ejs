@@ -64,6 +64,14 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="/auth/logout">Sign Out</a>
+                <a class="dropdown-item notifications" href="#">
+                  <% if(currentUser.notifications){ %>
+                    <input type="checkbox" id="email" name="email" value="true" checked>
+                  <% } else { %>
+                    <input type="checkbox" id="email" name="email" value="false">
+                  <% } %>
+                  <label for="email"> Email Notifications</label><br>
+                </a>
               </div>
             </li>
           <% } %>

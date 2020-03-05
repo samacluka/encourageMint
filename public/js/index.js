@@ -387,12 +387,23 @@ $(document).ready(function(){
     updatePlantSelect(plantid);
   });
 
+  $('input#email').on('click', function(){
+    $.ajax({
+      url: '/data/notifications',
+      type: 'PUT',
+      data: { checked: $('input#email').prop('checked'),
+              user: $('a#navbarDropdown').data("uid")},
+      success: function(result) {
+      }
+    });
+  });
+
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);
 
   loadAlerts();
   buildSVG();
-  
+
   setInterval(updateChart, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);
 });

@@ -9,6 +9,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
+    console.log(profile);
     User.findOne({ googleId: profile.id }, (err, user) => {
       if(err){
         console.log(err);
@@ -18,6 +19,7 @@ passport.use(new GoogleStrategy({
       } else {
         User.create({
           googleId: profile.id,
+          email: profile._json.email,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
         }, function(err, newUser){

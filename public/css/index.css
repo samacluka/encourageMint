@@ -109,6 +109,15 @@ div.alert{
   align-content: center;
 }
 
+a.notifications:hover{
+  background-color: white;
+  cursor: default;
+}
+
+input#email{
+  cursor: pointer;
+}
+
 /* Remove scrollbar */
 ::-webkit-scrollbar {
     width: 0px;  /* Remove scrollbar space */
