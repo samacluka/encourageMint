@@ -18,13 +18,97 @@ var lineWidth = 4;
 
 var data;
 
+var isInitialized = false;
+
 function buildSVG(){
   height = $(window).height()*0.75;
   width = $(window).width()*0.8;
   padding = (50 / 650) * width;
 
   if(svg) svg.remove();
-  initializeChart();
+
+  var [time, plantid, type] = getSelection();
+  if(!plantid) return;
+
+  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+    data = formatData(type, Data);
+    if(!data) return;
+
+    setScales(time, data);
+
+    d3.select('div.svg')
+      .append('svg')
+        .attr('version',1.1)
+        .attr('baseProfile', 'full')
+        .attr('xmlns', 'http://www.w3.org/2000/svg');
+
+    svg = d3.select('svg')
+              .attr('width', width)
+              .attr('height', height);
+
+    xAxis = svg
+            .append('g')
+            .classed('axis xAxis', true)
+            .attr('transform', `translate(0, ${height - padding})`)
+            .call(d3.axisBottom(xScale)
+                        .tickSize(-height + 2*padding)
+                        .tickSizeOuter(0)
+                        .tickFormat(d3.timeFormat(getTimeFormat(time))));
+
+    yAxis = svg
+            .append('g')
+            .classed('axis yAxis', true)
+            .attr('transform', `translate(${padding}, 0)`)
+            .call(d3.axisLeft(yScale)
+                        .tickSize(-width + 2*padding)
+                        .tickSizeOuter(0));
+
+
+    line = svg
+            .append('path')
+            .datum(data)
+              .attr('fill', 'none')
+              .attr('stroke', color(type))
+              .attr('stroke-width', lineWidth)
+              .attr('d', d3.line()
+                .x(function(d){ return xScale(d.created); })
+                .y(function(d){ return yScale(d.desired); })
+              );
+
+    // Set title
+    title = svg
+              .append('text')
+                .attr('id','title')
+                .attr('x', width / 2)
+                .attr('y', padding / 2)
+                .style('text-anchor','middle')
+                .text(getTitle(type));
+
+    // Set X axis label
+    xAxisLabel = svg
+                  .append('text')
+                    .attr('id','xAxisLabel')
+                    .classed('axisLabel',true)
+                    .attr('x', width / 2)
+                    .attr('y', height - padding)
+                    .attr('dy', '2.2em')
+                    .style('text-anchor','middle')
+                    .text('Time');
+
+    // Set Y axis label
+    yAxisLabel = svg
+                  .append('text')
+                    .attr('id','yAxisLabel')
+                    .classed('axisLabel',true)
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -height / 2)
+                    .attr('y', padding)
+                    .attr('dy', '-1.5em')
+                    .style('text-anchor','middle')
+                    .text(getYLabel(type));
+
+    isInitialized = true;
+  });
 }
 
 function color(type){
@@ -140,110 +224,11 @@ function getSelection(){
   return [time, plantid, type];
 }
 
-function updatePlantSelect(plantid){
-  $.ajax({ type: "GET",
-      url: `/data/plant/${$('a#navbarDropdown').data("uid")}/uid`,
-      async: true,
-      success : function(plants){
-        var str = "";
-
-        plants.forEach((plant, index) => {
-          if(plantid === plant._id){
-            str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
-          } else {
-            str += `<option value="${plant._id}">${plant.Name}</option>`;
-          }
-        });
-
-        $('select#plant-select').html(str);
-      }
-    });
-}
-
-function initializeChart(){
-  var [time, plantid, type] = getSelection();
-  if(!plantid) return;
-
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
-    data = formatData(type, Data);
-    if(!data) return;
-
-    setScales(time, data);
-
-    d3.select('div.svg')
-      .append('svg')
-        .attr('version',1.1)
-        .attr('baseProfile', 'full')
-        .attr('xmlns', 'http://www.w3.org/2000/svg');
-
-    svg = d3.select('svg')
-              .attr('width', width)
-              .attr('height', height);
-
-    xAxis = svg
-            .append('g')
-            .classed('axis xAxis', true)
-            .attr('transform', `translate(0, ${height - padding})`)
-            .call(d3.axisBottom(xScale)
-                        .tickSize(-height + 2*padding)
-                        .tickSizeOuter(0)
-                        .tickFormat(d3.timeFormat(getTimeFormat(time))));
-
-    yAxis = svg
-            .append('g')
-            .classed('axis yAxis', true)
-            .attr('transform', `translate(${padding}, 0)`)
-            .call(d3.axisLeft(yScale)
-                        .tickSize(-width + 2*padding)
-                        .tickSizeOuter(0));
-
-
-    line = svg
-            .append('path')
-            .datum(data)
-              .attr('fill', 'none')
-              .attr('stroke', color(type))
-              .attr('stroke-width', lineWidth)
-              .attr('d', d3.line()
-                .x(function(d){ return xScale(d.created); })
-                .y(function(d){ return yScale(d.desired); })
-              );
-
-    // Set title
-    title = svg
-              .append('text')
-                .attr('id','title')
-                .attr('x', width / 2)
-                .attr('y', padding / 2)
-                .style('text-anchor','middle')
-                .text(getTitle(type));
-
-    // Set X axis label
-    xAxisLabel = svg
-                  .append('text')
-                    .attr('id','xAxisLabel')
-                    .classed('axisLabel',true)
-                    .attr('x', width / 2)
-                    .attr('y', height - padding)
-                    .attr('dy', '2.2em')
-                    .style('text-anchor','middle')
-                    .text('Time');
-
-    // Set Y axis label
-    yAxisLabel = svg
-                  .append('text')
-                    .attr('id','yAxisLabel')
-                    .classed('axisLabel',true)
-                    .attr('transform', 'rotate(-90)')
-                    .attr('x', -height / 2)
-                    .attr('y', padding)
-                    .attr('dy', '-1.5em')
-                    .style('text-anchor','middle')
-                    .text(getYLabel(type));
-  });
-}
-
 function updateChart(){
+  if(!isInitialized){
+    buildSVG();
+  }
+
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
@@ -280,9 +265,6 @@ function updateChart(){
           .y(function(d){ return yScale(d.desired); })
         );
 
-    // Update Select
-    updatePlantSelect(plantid);
-
     // Update Title
     title
       .text(getTitle(type));
@@ -309,6 +291,7 @@ function selectPill(event){
 }
 
 function loadAlerts(){
+  if(!$('select#plant-select').val()) return;
   $.ajax({ type: "GET",
       url: `/data/message/${$('select#plant-select').val()}/pid`,
       async: true,
@@ -352,39 +335,38 @@ function loadAlerts(){
     });
 }
 
+function registerButton(){
+  if(!$('select#plant-select').val()) return;
+  $.ajax({ type: "GET",
+      url: `/data/plant/${$('select#plant-select').val()}/pid`,
+      async: true,
+      success : function(plant){
+        [plant] = plant; // remove array wrapper
+        if(!plant.mc){
+          $('button#registerPlant').show({duration: 800});
+        } else {
+          $('button#registerPlant').hide({duration: 400});
+        }
+      }
+    });
+}
+
 $(document).ready(function(){
   $('div.empty').width($('div.type-pills').width()); // to center the svg
 
   $('div.type-pills a').on('click', {str: 'type'}, selectPill);
   $('div.time-pills a').on('click', {str: 'time'}, selectPill);
   $('select#plant-select').on('change', function(event){
-    updateChart();
     event.stopPropagation();
-    if(!$(this).val()) return;
-    $.ajax({ type: "GET",
-        url: `/data/plant/${$(this).val()}/pid`,
-        async: true,
-        success : function(plant){
-          [plant] = plant; // remove array wrapper
-          if(!plant.mc){
-            $('button#registerPlant').show({duration: 800});
-          } else {
-            $('button#registerPlant').hide({duration: 400});
-          }
-        }
-      });
+    updateChart();
+    registerButton();
     loadAlerts();
   });
+  setTimeout(registerButton,200);
 
   $('button#registerPlant').on('click', function(event){
     $.post( "/config/new", { plant: $('select#plant-select').val() });
     $(this).hide({duration: 400});
-  });
-
-  $('.modal').on('hide.bs.modal', function(){
-    var [time, plantid, type] = getSelection();
-    if(!plantid) return;
-    updatePlantSelect(plantid);
   });
 
   $('input#email').on('click', function(){
@@ -402,7 +384,7 @@ $(document).ready(function(){
   $(window).on('resize', debBuildSVG);
 
   loadAlerts();
-  buildSVG();
+  debBuildSVG();
 
   setInterval(updateChart, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);

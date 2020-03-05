@@ -24,7 +24,7 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="modal" data-target="#newPlantModal">New Plant</a>
           </li>
@@ -33,26 +33,20 @@
           </li>
         </ul>
 
-        <ul class="navbar-nav mx-auto">
-          <div class="plantSelect-registerButton">
-            <div class="from-group">
-              <select class="form-control" id="plant-select">
-                <% if(plants){ %>
-                  <% plants.forEach((plant, index) => { %>
-                    <% if(index === 0){ %>
-                      <option value="<%= plant.id %>" selected><%= plant.Name %></option>
-                    <% } else { %>
-                      <option value="<%= plant.id %>"><%= plant.Name %></option>
-                    <% } %>
-                  <% }) %>
-                <% } %>
-              </select>
+        <% if(numPlants !== 0){ %>
+          <ul class="navbar-nav mx-auto">
+            <div class="plantSelect-registerButton">
+              <div class="from-group">
+                <select class="form-control" id="plant-select">
+                  <!-- Empty Select - populated by client side javascript -->
+                </select>
+              </div>
+              <button type="button" id="registerPlant" class="btn btn-warning">Connect Plant</button>
             </div>
-            <button type="button" id="registerPlant" class="btn btn-warning">Connect Plant</button>
-          </div>
-        </ul>
+          </ul>
+        <% } %>
 
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ml-auto">
           <% if(!currentUser){ %>
             <li class="nav-item">
               <a class="nav-link" href="/auth/google">Sign in with Google</a>
@@ -79,46 +73,50 @@
       </div>
     </nav>
 
-    <!-- Messages -->
-    <div class="messages">
-      <div class="container">
-        <h2 class="pt-3">Messages</h2>
-        <hr class="style-two">
+    <% if(numPlants == 0){ %>
+      <!-- Use this  space to make tooltip for new plant button -->
+    <% } else { %>
+      <!-- Messages -->
+      <div class="messages">
+        <div class="container">
+          <h2 class="pt-3">Messages</h2>
+          <hr class="style-two">
+        </div>
       </div>
-    </div>
 
-    <!-- SVG -->
-    <div class="dashboard">
-      <div class="container">
-        <h2 class="pt-3">Dashboard</h2>
-        <hr class="style-two">
-      </div>
-      <div class="flex-cont">
-        <div class="type-pills">
-          <a href="#" class="badge badge-pill badge-dark type-pill selected" data-type="temperature">Temperature</a>
-          <a href="#" class="badge badge-pill badge-light type-pill" data-type="humidity">Humidity</a>
-          <a href="#" class="badge badge-pill badge-light type-pill" data-type="soilMoisture">Soil Moisture</a>
-          <a href="#" class="badge badge-pill badge-light type-pill" data-type="light">Light Intensity</a>
+      <!-- SVG -->
+      <div class="dashboard">
+        <div class="container">
+          <h2 class="pt-3">Dashboard</h2>
+          <hr class="style-two">
         </div>
-        <div class="flex-cont-vert">
-          <div class="svg">
-            <!-- <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"></svg> -->
+        <div class="flex-cont">
+          <div class="type-pills">
+            <a href="#" class="badge badge-pill badge-dark type-pill selected" data-type="temperature">Temperature</a>
+            <a href="#" class="badge badge-pill badge-light type-pill" data-type="humidity">Humidity</a>
+            <a href="#" class="badge badge-pill badge-light type-pill" data-type="soilMoisture">Soil Moisture</a>
+            <a href="#" class="badge badge-pill badge-light type-pill" data-type="light">Light Intensity</a>
           </div>
-          <div class="time-pills">
-            <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
-            <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
+          <div class="flex-cont-vert">
+            <div class="svg">
+              <!-- <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"></svg> -->
+            </div>
+            <div class="time-pills">
+              <a href="#" class="badge badge-pill badge-dark time-pill selected" data-time="1">1h</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="2">2h</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="12">12h</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="24">1D</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="72">3D</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="168">1W</a>
+              <a href="#" class="badge badge-pill badge-light time-pill" data-time="336">2W</a>
+            </div>
+          </div>
+          <div class="empty">
+            <!-- empty div for flexbox spacing purposes -->
           </div>
         </div>
-        <div class="empty">
-          <!-- empty div for flexbox spacing purposes -->
-        </div>
       </div>
-    </div>
+    <% } %>
 
     <!-- New Plant Modal -->
     <div class="modal fade" id="newPlantModal" tabindex="-1" role="dialog" aria-labelledby="newPlantModalTitle" aria-hidden="true">
@@ -177,13 +175,7 @@
             <div class="container-fluid">
               <div class="from-group row">
                 <select class="form-control" id="update-plant-select">
-                  <% plants.forEach((plant, index) => { %>
-                    <% if(index === 0){ %>
-                      <option value="<%= plant.id %>" selected><%= plant.Name %></option>
-                    <% } else { %>
-                      <option value="<%= plant.id %>"><%= plant.Name %></option>
-                    <% } %>
-                  <% }) %>
+                  <!-- Empty Select - populated by client side javascript -->
                 </select>
               </div>
               <hr class="style-two">

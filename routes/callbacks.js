@@ -106,9 +106,8 @@ callbacks.index.get.index = function(req,res){
   console.log('================ '+req.clientIp+' ================');
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if (err) throw err;
-    Message.find({plant: foundPlants[0]._id}, (err, foundMessages) => {
-      res.render(views.index.index, {plants: foundPlants, messages: foundMessages});
-    });
+
+    res.render(views.index.index, {numPlants: foundPlants.length});
   });
 };
 
@@ -130,7 +129,7 @@ callbacks.index.post.newPlant = function(req, res){
 
   Plant.create(PlantObj, (err, newPlant) => {
           if(err) throw err;
-          res.end();
+          res.send(newPlant);
         });
 }
 

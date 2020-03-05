@@ -1,3 +1,23 @@
+function updateSelect(select, plantid=-1){
+  var numPlants;
+  $.get(`/data/plant/${$('a#navbarDropdown').data("uid")}/uid`)
+   .done(function( plants ){
+      var str = "";
+
+      plants.forEach((plant, index) => {
+        if((plantid != -1 && plantid === plant._id) || (plantid == -1 && index == 0)){
+          str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
+        } else {
+          str += `<option value="${plant._id}">${plant.Name}</option>`;
+        }
+      });
+
+      $(`select#${ select }`).html(str);
+      numPlants = plants.length;
+  });
+  return(numPlants);
+}
+
 function postNewPlant(){
   $.post( "/newPlant",{
                         Name: $('input#newPlantName').val(),
@@ -8,9 +28,13 @@ function postNewPlant(){
                         lightThresholdMin: $('input#newLightMin').val(),
                         lightThresholdMax: $('input#newLightMax').val()
                       }
-        ).done(function(){
+        ).done(function( result ){
           $('div#newPlantModal input').val('');
           $('select#newPlantType').prop('selectedIndex',0);
+          var numPlants = updateSelect('plant-select', result._id);
+          if(numPlants == 1){
+            location.reload();
+          }
         });
 }
 
@@ -39,36 +63,23 @@ function deletePlant(){
     type: 'DELETE',
     data: { id: $('select#update-plant-select option:selected').val() },
     success: function(){
+      updateSelect('update-plant-select');
+      updateSelect('plant-select');
     }
   });
-
-  $('select#update-plant-select').prop('selectedIndex',0);
 }
 
 function updatePlantForm(event){
-  var usePlant;
+  var plantid;
   if(event.data.from === 'show'){
-    usePlant = $('select#plant-select option:selected').val();
+    plantid = $('select#plant-select option:selected').val();
   } else {
-    usePlant = $('select#update-plant-select option:selected').val();
+    plantid = $('select#update-plant-select option:selected').val();
   }
 
-  $.get(`/data/plant/${$('a#navbarDropdown').data("uid")}/uid`)
-   .done(function( plants ){
-      var str = "";
+  updateSelect('update-plant-select', plantid);
 
-      plants.forEach((plant, index) => {
-        if(usePlant === plant._id){
-          str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
-        } else {
-          str += `<option value="${plant._id}">${plant.Name}</option>`;
-        }
-      });
-
-      $('select#update-plant-select').html(str);
-  });
-
-  $.get(`/data/plant/${ usePlant }/pid`)
+  $.get(`/data/plant/${ plantid }/pid`)
    .done(function( data ) {
       [data] = data; // remove array wrapping
       $('input#updatePlantName').val(data.Name);
@@ -96,6 +107,7 @@ function loadDefault(event){
 }
 
 $(document).ready(function(){
+    updateSelect('plant-select');
     $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);

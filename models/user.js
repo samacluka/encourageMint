@@ -8,7 +8,7 @@ var userSchema = new mongoose.Schema({
   lastName: String,
   notifications: {type: Boolean, default: true},
   email: String,
-  plants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
+  username: String,
   googleId: String,
 }, { collection: 'User' });
 
