@@ -383,8 +383,8 @@ $(document).ready(function(){
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);
 
-  loadAlerts();
-  debBuildSVG();
+  setTimeout(loadAlerts, 300);
+  setTimeout(buildSVG, 300);
 
   setInterval(updateChart, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);

@@ -1,21 +1,24 @@
-function updateSelect(select, plantid=-1){
-  var numPlants;
+var numPlants;
+
+function updateSelects(plantid=-1){
+  // var numPlants;
   $.get(`/data/plant/${$('a#navbarDropdown').data("uid")}/uid`)
    .done(function( plants ){
       var str = "";
 
       plants.forEach((plant, index) => {
-        if((plantid != -1 && plantid === plant._id) || (plantid == -1 && index == 0)){
+        if((plantid !== -1 && plantid === plant._id) || (plantid === -1 && index === 0)){
           str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
         } else {
           str += `<option value="${plant._id}">${plant.Name}</option>`;
         }
       });
 
-      $(`select#${ select }`).html(str);
+      $('select#update-plant-select').html(str);
+      $('select#plant-select').html(str);
       numPlants = plants.length;
   });
-  return(numPlants);
+  return(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
 function postNewPlant(){
@@ -31,8 +34,7 @@ function postNewPlant(){
         ).done(function( result ){
           $('div#newPlantModal input').val('');
           $('select#newPlantType').prop('selectedIndex',0);
-          var numPlants = updateSelect('plant-select', result._id);
-          if(numPlants == 1){
+          if(updateSelects(result._id) == 0){ // If there was 0 plants before adding a new one
             location.reload();
           }
         });
@@ -63,8 +65,9 @@ function deletePlant(){
     type: 'DELETE',
     data: { id: $('select#update-plant-select option:selected').val() },
     success: function(){
-      updateSelect('update-plant-select');
-      updateSelect('plant-select');
+      if(updateSelects() == 1){ // If there was 1 plant before deleting it
+        location.reload();
+      }
     }
   });
 }
@@ -77,7 +80,7 @@ function updatePlantForm(event){
     plantid = $('select#update-plant-select option:selected').val();
   }
 
-  updateSelect('update-plant-select', plantid);
+  updateSelects(plantid);
 
   $.get(`/data/plant/${ plantid }/pid`)
    .done(function( data ) {
@@ -107,7 +110,7 @@ function loadDefault(event){
 }
 
 $(document).ready(function(){
-    updateSelect('plant-select');
+    updateSelects();
     $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);

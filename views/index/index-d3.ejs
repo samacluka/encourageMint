@@ -24,16 +24,16 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#newPlantModal">New Plant</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#updatePlantModal">Update Plant</a>
-          </li>
-        </ul>
-
         <% if(numPlants !== 0){ %>
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-toggle="modal" data-target="#newPlantModal">New Plant</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-toggle="modal" data-target="#updatePlantModal">Update Plant</a>
+            </li>
+          </ul>
+
           <ul class="navbar-nav mx-auto">
             <div class="plantSelect-registerButton">
               <div class="from-group">
@@ -74,7 +74,17 @@
     </nav>
 
     <% if(numPlants == 0){ %>
-      <!-- Use this  space to make tooltip for new plant button -->
+      <div class="container pt-3">
+        <div class="jumbotron">
+          <h1 class="display-4">Welcome to the encourageMint System!</h1>
+          <p class="lead"><%= currentUser.firstName + " " + currentUser.lastName %>, we are very excited to have you.</p>
+          <hr class="my-4">
+          <p>Please begin by adding a new plant to your system</p>
+          <p class="lead">
+            <a class="btn btn-primary btn-lg" href="#" data-toggle="modal" data-target="#newPlantModal">New Plant</a>
+          </p>
+        </div>
+      </div>
     <% } else { %>
       <!-- Messages -->
       <div class="messages">
@@ -213,9 +223,11 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <% if(numPlants > 0){ %>
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
     <script src="/js/index.js"></script>
     <script src="/js/modal.js"></script>
+    <% } %>
   </body>
 </html>
