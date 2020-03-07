@@ -330,7 +330,8 @@ callbacks.config.post.new = function(req,res){
     if(err) throw err;
 
     if(!req.body.plant){ // From Microcontroller
-      var mcid = JSON.stringify({id: genUID()});
+      var mcid = genUID();
+      var mcidJSON = JSON.stringify({id: mcid});
       if(foundConfig){ // Second to hit route
         console.log("Microcontroller was second to route");
         Plant.findById(foundConfig.plant, (err, foundPlant) => {
@@ -341,7 +342,7 @@ callbacks.config.post.new = function(req,res){
             Config.deleteOne({ip: reqIp}, (err) => {
               if(err) throw err;
               console.log('Microcontroller finished config');
-              return res.send(mcid);
+              return res.send(mcidJSON);
             });
           });
         });
@@ -353,14 +354,15 @@ callbacks.config.post.new = function(req,res){
         },(err, newConfig) => {
           if(err) throw err;
           console.log('Microcontroller started config');
-          return res.send(mcid);
+          return res.send(mcidJSON);
         });
       }
     } else{ // From webapp
-      if(foundConfig){ // Second to hit route
-        console.log("Web app was second to route");
-        Plant.findById(req.body.plant, (err, foundPlant) => {
-          if(err) throw err;
+      Plant.findById(req.body.plant, (err, foundPlant) => {
+        if(err) throw err;
+        if(foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
+        if(foundConfig){ // Second to hit route
+          console.log("Web app was second to route");
 
           foundPlant.mc = foundConfig.mc;
           foundPlant.save().then((savedPlant) => {
@@ -370,18 +372,18 @@ callbacks.config.post.new = function(req,res){
               return res.end();
             });
           });
-        });
-      } else { // First
-        console.log("Web app was first to route");
-        Config.create({
-          plant: req.body.plant,
-          ip: reqIp
-        }, (err,newConfig) => {
-          if(err) throw err;
-          console.log('Web app started config');
-          return res.end();
-        });
-      }
+        } else { // First
+          console.log("Web app was first to route");
+          Config.create({
+            plant: req.body.plant,
+            ip: reqIp
+          }, (err,newConfig) => {
+            if(err) throw err;
+            console.log('Web app started config');
+            return res.end();
+          });
+        }
+      });
     }
   });
 }
