@@ -5,7 +5,7 @@ function updateSelects(plantid=-1){
   $.ajax({ type: "GET",
       url: '/data/plant',
       data: {id: $('a#navbarDropdown').data("uid"), type: 'uid'},
-      async: true,
+      async: false,
       success: function( plants ){
          var str = "";
 
@@ -22,6 +22,7 @@ function updateSelects(plantid=-1){
          numPlants = plants.length;
      }
   });
+  loadAlerts(); // function from ./index.js
   return(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
@@ -59,7 +60,7 @@ function updatePlant(){
             lightThresholdMax: $('input#updateLightMax').val()
           },
     success: function(result) {
-      updateSelects(result._id);
+      updateSelects($('select#update-plant-select').val());
     }
   });
 }

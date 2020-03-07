@@ -373,10 +373,7 @@ $(document).ready(function(){
     $.ajax({
       url: '/data/notifications',
       type: 'PUT',
-      data: { checked: $('input#email').prop('checked'),
-              user: $('a#navbarDropdown').data("uid")},
-      success: function(result) {
-      }
+      data: { checked: $('input#email').prop('checked'), user: $('a#navbarDropdown').data("uid") }
     });
   });
 
