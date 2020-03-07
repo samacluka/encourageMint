@@ -2,27 +2,31 @@ var numPlants;
 
 function updateSelects(plantid=-1){
   // var numPlants;
-  $.get(`/data/plant/${$('a#navbarDropdown').data("uid")}/uid`)
-   .done(function( plants ){
-      var str = "";
+  $.ajax({ type: "GET",
+      url: '/data/plant',
+      data: {id: $('a#navbarDropdown').data("uid"), type: 'uid'},
+      async: true,
+      success: function( plants ){
+         var str = "";
 
-      plants.forEach((plant, index) => {
-        if((plantid !== -1 && plantid === plant._id) || (plantid === -1 && index === 0)){
-          str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
-        } else {
-          str += `<option value="${plant._id}">${plant.Name}</option>`;
-        }
-      });
+         plants.forEach((plant, index) => {
+           if((plantid !== -1 && plantid === plant._id) || (plantid === -1 && index === 0)){
+             str += `<option value="${plant._id}" selected>${plant.Name}</option>`;
+           } else {
+             str += `<option value="${plant._id}">${plant.Name}</option>`;
+           }
+         });
 
-      $('select#update-plant-select').html(str);
-      $('select#plant-select').html(str);
-      numPlants = plants.length;
+         $('select#update-plant-select').html(str);
+         $('select#plant-select').html(str);
+         numPlants = plants.length;
+     }
   });
   return(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
 function postNewPlant(){
-  $.post( "/newPlant",{
+  $.post( "/data/newPlant", {
                         Name: $('input#newPlantName').val(),
                         Type: $('select#newPlantType').val(),
                         Owner: $('a#navbarDropdown').data("uid"),
@@ -42,7 +46,7 @@ function postNewPlant(){
 
 function updatePlant(){
   $.ajax({
-    url: '/updatePlant',
+    url: '/data/updatePlant',
     type: 'PUT',
     data: {
             plantid: $('select#update-plant-select').val(),
@@ -55,13 +59,14 @@ function updatePlant(){
             lightThresholdMax: $('input#updateLightMax').val()
           },
     success: function(result) {
+      updateSelects(result._id);
     }
   });
 }
 
 function deletePlant(){
   $.ajax({
-    url: '/deletePlant',
+    url: '/data/deletePlant',
     type: 'DELETE',
     data: { id: $('select#update-plant-select option:selected').val() },
     success: function(){
@@ -82,22 +87,26 @@ function updatePlantForm(event){
 
   updateSelects(plantid);
 
-  $.get(`/data/plant/${ plantid }/pid`)
-   .done(function( data ) {
-      [data] = data; // remove array wrapping
-      $('input#updatePlantName').val(data.Name);
-      $('select#updatePlantType').val(data.Type);
-      $('input#updateSoilMoistureMin').val(data.soilMoisture.min);
-      $('input#updateSoilMoistureMax').val(data.soilMoisture.max);
-      $('input#updateLightMin').val(data.lightThreshold.min);
-      $('input#updateLightMax').val(data.lightThreshold.max);
+  $.ajax({ type: "GET",
+      url: '/data/plant',
+      data: {id: plantid, type: 'pid'},
+      async: true,
+      success: function( data ) {
+         [data] = data; // remove array wrapping
+         $('input#updatePlantName').val(data.Name);
+         $('select#updatePlantType').val(data.Type);
+         $('input#updateSoilMoistureMin').val(data.soilMoisture.min);
+         $('input#updateSoilMoistureMax').val(data.soilMoisture.max);
+         $('input#updateLightMin').val(data.lightThreshold.min);
+         $('input#updateLightMax').val(data.lightThreshold.max);
+     }
   });
 }
 
 function loadDefault(event){
   var from = event.data.from;
 
-  $.get(`/data/default/${$(`select#${from}PlantType`).val()}`)
+  $.get('/data/default', { type: $(`select#${from}PlantType`).val() })
    .done(function( data ){
      [data] = data; // removed array wrapper
      if(!data) return;

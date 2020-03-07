@@ -31,24 +31,20 @@ var callbacks = {
         // landing
         // index
       },
-      post: {
-        // newPlant
-      },
-      put: {
-        // updatePlant
-      },
-      delete: {
-        // deletePlant
-      }
   },
   data: {
     get: {
       // plant
       // log
       // message
+      // default
+    },
+    post: {
+      // newPlant
     },
     put: {
-
+      // notifications
+      // updatePlant
     },
     delete: {
       // message
@@ -111,8 +107,51 @@ callbacks.index.get.index = function(req,res){
   });
 };
 
+// ======================================== DATA ========================================
+// GET
+callbacks.data.get.log = function(req,res){
+  var time = new Date();
+  time.setTime(time.getTime() - req.params.time * 60 * 60 * 1000);
+
+  // Find anything younger than one week
+  var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
+
+  Log.find(query).sort('created').exec((err, logs) => {
+    if (err) throw err;
+    res.send(logs);
+  });
+}
+
+callbacks.data.get.plant = function(req,res){
+  var query = {};
+  if(req.query.type === 'uid'){
+    query = {Owner: req.query.id};
+  } else if(req.query.type === 'pid') {
+    query = {_id: req.query.id};
+  }
+
+  Plant.find(query, (err, foundPlants) => {
+    if (err) throw err;
+    res.send(foundPlants);
+  });
+}
+
+callbacks.data.get.message = function(req,res){
+  Message.find({plant: req.query.id}, (err, foundMessages) => {
+    if(err) throw err;
+    res.send(foundMessages);
+  });
+}
+
+callbacks.data.get.default = function(req,res){
+  Default.find({type: req.query.type}, (err, foundDefault) => {
+    if(err) throw err;
+    res.send(foundDefault);
+  });
+}
+
 // POST
-callbacks.index.post.newPlant = function(req, res){
+callbacks.data.post.newPlant = function(req, res){
   var PlantObj = {
       Name: req.body.Name,
       Type: req.body.Type,
@@ -134,7 +173,21 @@ callbacks.index.post.newPlant = function(req, res){
 }
 
 // PUT
-callbacks.index.put.updatePlant = function(req, res){
+callbacks.data.put.notifications = function(req,res){
+  User.findById(req.body.user, (err, foundUser) => {
+    if(err) throw err;
+    foundUser.notifications = req.body.checked;
+    foundUser.save()
+                .then((savedUser) => {
+                  res.end();
+                }).catch((e) => {
+                  console.log(e);
+                  res.end();
+                });
+  });
+}
+
+callbacks.data.put.updatePlant = function(req, res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     foundPlant.Name = req.body.Name;
     foundPlant.Type = req.body.Type;
@@ -155,85 +208,15 @@ callbacks.index.put.updatePlant = function(req, res){
 }
 
 // DELETE
-callbacks.index.delete.plant = function(req, res){
-  Plant.deleteOne({_id: req.body.id}, function(err){
+callbacks.data.delete.message = function(req,res){
+  Message.deleteOne({_id: req.body.id}, (err) => {
     if(err) throw err;
     res.end();
   });
 }
 
-// ======================================== DATA ========================================
-// GET
-callbacks.data.get.log = function(req,res){
-  var time = new Date();
-  time.setTime(time.getTime() - req.params.time * 60 * 60 * 1000);
-
-  // Find anything younger than one week
-  var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
-
-  Log.find(query).sort('created').exec((err, logs) => {
-    if (err) throw err;
-    res.send(logs);
-  });
-}
-
-callbacks.data.get.plant = function(req,res){
-  var query = {};
-  if(req.params.type === 'uid'){
-    query = {Owner: req.params.id};
-  } else if(req.params.type === 'pid') {
-    query = {_id: req.params.id};
-  }
-
-  Plant.find(query, (err, foundPlants) => {
-    if (err) throw err;
-    res.send(foundPlants);
-  });
-}
-
-callbacks.data.get.message = function(req,res){
-  var query = {};
-  if(req.params.type === 'uid'){
-    query = {owner: req.params.id};
-  } else if(req.params.type === 'pid') {
-    query = {plant: req.params.id};
-  }
-
-  Message.find(query, (err, foundMessages) => {
-    if(err) throw err;
-    res.send(foundMessages);
-  });
-}
-
-callbacks.data.get.default = function(req,res){
-  var query = {type: req.params.type};
-
-  Default.find(query, (err, foundDefault) => {
-    if(err) throw err;
-    res.send(foundDefault);
-  });
-}
-
-// PUT
-callbacks.data.put.notifications = function(req,res){
-  User.findById(req.body.user, (err, foundUser) => {
-    if(err) throw err;
-    foundUser.notifications = req.body.checked;
-    foundUser.save()
-                .then((savedUser) => {
-                  res.end();
-                }).catch((e) => {
-                  console.log(e);
-                  res.end();
-                });
-  });
-}
-
-// DELETE
-callbacks.data.delete.message = function(req,res){
-  var query = {_id: req.params.id};
-
-  Message.deleteOne(query, (err) => {
+callbacks.data.delete.plant = function(req, res){
+  Plant.deleteOne({_id: req.body.id}, function(err){
     if(err) throw err;
     res.end();
   });

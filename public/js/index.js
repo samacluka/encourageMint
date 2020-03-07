@@ -293,7 +293,8 @@ function selectPill(event){
 function loadAlerts(){
   if(!$('select#plant-select').val()) return;
   $.ajax({ type: "GET",
-      url: `/data/message/${$('select#plant-select').val()}/pid`,
+      url: '/data/message',
+      data: { id: $('select#plant-select').val() },
       async: true,
       success : function(messages){
         $('div.alert').each(function(i){
@@ -324,11 +325,9 @@ function loadAlerts(){
 
         $('div.alert button.delete').on('click', function(){
           $.ajax({ type: 'DELETE',
-                   url: `/data/message/${$(this).parent().parent().data('id')}`,
-                   async: true,
-                   success : function(){
-                     console.log('successfully deleted');
-                   }
+                   url: '/data/message',
+                   data: { id: $(this).parent().parent().data('id') },
+                   async: true
           });
         });
       }
@@ -338,7 +337,8 @@ function loadAlerts(){
 function registerButton(){
   if(!$('select#plant-select').val()) return;
   $.ajax({ type: "GET",
-      url: `/data/plant/${$('select#plant-select').val()}/pid`,
+      url: '/data/plant',
+      data: {id: $('select#plant-select').val(), type: 'pid'},
       async: true,
       success : function(plant){
         [plant] = plant; // remove array wrapper
