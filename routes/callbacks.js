@@ -260,14 +260,12 @@ callbacks.controller.post.message = function(req,res){
     });
 
     var time = new Date();
-    time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago
-    //Delete any logs older than a week
-    Message.deleteMany({created: {$lt: time}}, (err) => {
+    time.setTime(time.getTime()- 7 * 24 * 60 * 60 * 1000); // One week ago
+    Message.deleteMany({created: {$lt: time}}); //Delete any messages older than a week
+
+    Message.create(mesObj, (err, newMessage) => {
       if(err) throw err;
-      Message.create(mesObj, (err, newMessage) => {
-        if(err) throw err
-        res.end();
-      });
+      res.end();
     });
 
   } catch (e) {
@@ -288,14 +286,12 @@ callbacks.controller.put.logs = function(req,res){
     }
 
     var time = new Date();
-    time.setTime(time.getTime()- 2 * 7 * 24 * 60 * 60 * 1000); // Two week ago
-    //Delete any logs older than a week
-    Log.deleteMany({created: {$lt: time}}, (err) => {
+    time.setTime(time.getTime()- 7 * 24 * 60 * 60 * 1000); // One week ago
+    Log.deleteMany({created: {$lt: time}}); //Delete any logs older than a week
+
+    Log.create(logObj,(err, newLog) => {
       if(err) throw err;
-      Log.create(logObj,(err, newLog) => {
-        if(err) throw err
-        res.end();
-      });
+      res.end();
     });
 
   } catch (e) {
@@ -308,7 +304,11 @@ callbacks.controller.put.logs = function(req,res){
 // POST
 callbacks.config.post.new = function(req,res){
   var time = new Date();
-  time.setTime(time.getTime() - 5 * 60 * 1000);
+  time.setTime(time.getTime()- 7 * 24 * 60 * 60 * 1000); // One week ago
+  Config.deleteMany({created: {$lt: time}}); //Delete any configs older than a week
+
+  var time = new Date();
+  time.setTime(time.getTime() - 5 * 60 * 1000); // 5 minutes ago
 
   reqIp = req.clientIp.split('.')[0] + req.clientIp.split('.')[1]; // concat first two elements of ip
 
