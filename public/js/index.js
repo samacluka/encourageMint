@@ -362,7 +362,7 @@ $(document).ready(function(){
     registerButton();
     loadAlerts();
   });
-  setTimeout(registerButton,200);
+  setTimeout(registerButton, 200);
 
   $('button#registerPlant').on('click', function(event){
     $.post( "/config/new", { plant: $('select#plant-select').val() });
@@ -380,8 +380,8 @@ $(document).ready(function(){
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);
 
-  setTimeout(loadAlerts, 300);
-  setTimeout(buildSVG, 300);
+  setTimeout(loadAlerts, 200);
+  setTimeout(buildSVG, 200);
 
   setInterval(updateChart, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);
