@@ -218,7 +218,13 @@ callbacks.data.delete.message = function(req,res){
 callbacks.data.delete.plant = function(req, res){
   Plant.deleteOne({_id: req.body.id}, function(err){
     if(err) throw err;
-    res.end();
+    Log.deleteMany({plant: req.body.id}, function(err){
+      if(err) throw err;
+      Message.deleteMany({plant: req.body.id}, function(err){
+        if(err) throw err;
+        res.end();
+      });
+    });
   });
 }
 
