@@ -181,23 +181,10 @@ function formatData(type, Data){
   if(!Data) return Data;
   Data.forEach(function(d,i){
     d.created = new Date(d.created).getTime();
-
-    switch(type) {
-      case "temperature":
-        d.desired = d.temperature;
-        break;
-      case "humidity":
-        d.desired = d.humidity;
-        break;
-      case "soilMoisture":
-        d.desired = d.soilMoisture;
-        break;
-      case "light":
-        d.desired = d.light;
-        break;
-      default:
-        d.desired = -1;
-    }
+    d.desired = type === 'temperature' ? d.temperature :
+                type === 'humidity' ? d.humidity :
+                type === 'soilMoisture' ? d.soilMoisture :
+                type === 'light' ? d.light : -1;
   });
   return Data;
 }
@@ -225,9 +212,7 @@ function getSelection(){
 }
 
 function updateChart(){
-  if(!isInitialized){
-    buildSVG();
-  }
+  if(!isInitialized) buildSVG();
 
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
