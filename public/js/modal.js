@@ -1,8 +1,6 @@
-var numPlants;
-
-function updateSelects(plantid=-1){
-  // var numPlants;
-  $.ajax({ type: "GET",
+async function updateSelects(plantid=-1){
+  var numPlants;
+  await $.ajax({ type: "GET",
       url: '/data/plant',
       data: {id: $('a#navbarDropdown').data("uid"), type: 'uid'},
       async: false,
@@ -22,8 +20,10 @@ function updateSelects(plantid=-1){
          numPlants = plants.length;
      }
   });
-  loadAlerts(); // function from ./index.js
-  return(numPlants); // calling this function returns the number of plants before any addition or deletion even
+  // Timeout need so the select has time to load data
+  setTimeout(loadAlerts, 200); // function from ./index.js
+  setTimeout(registerButton, 200); // function from ./index.js
+  return Promise.resolve(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
 function postNewPlant(){
@@ -39,9 +39,9 @@ function postNewPlant(){
         ).done(function( result ){
           $('div#newPlantModal input').val('');
           $('select#newPlantType').prop('selectedIndex',0);
-          if(updateSelects(result._id) == 0){ // If there was 0 plants before adding a new one
-            location.reload();
-          }
+          updateSelects(result._id).then((numPlants) => {
+            if(numPlants === 1) location.reload();
+          });
         });
 }
 
@@ -71,9 +71,9 @@ function deletePlant(){
     type: 'DELETE',
     data: { id: $('select#update-plant-select option:selected').val() },
     success: function(){
-      if(updateSelects() == 1){ // If there was 1 plant before deleting it
-        location.reload();
-      }
+      updateSelects().then((numPlants) => {
+        if(numPlants === 0) location.reload();
+      });
     }
   });
 }
