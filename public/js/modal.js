@@ -26,7 +26,7 @@ async function updateSelects(plantid=-1){
   return Promise.resolve(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
-function postNewPlant(){
+function newPlant(){
   $.post( "/data/newPlant", {
                         Name: $('input#newPlantName').val(),
                         Type: $('select#newPlantType').val(),
@@ -119,9 +119,20 @@ function loadDefault(event){
   });
 }
 
+function modalKeypress(event) {
+  var keycode = (event.keyCode ? event.keyCode : event.which);
+  if(keycode == '13'){
+     event.data.cb();
+     $(this).modal('hide');
+  }
+}
+
 $(document).ready(function(){
     updateSelects();
-    $('div#newPlantModal button#newPlantSubmit').on('click', postNewPlant);
+    $('#newPlantModal').on('keypress', {cb: newPlant}, modalKeypress);
+    $('#newPlantSubmit').on('click', newPlant);
+
+    $('#updatePlantModal').on('keypress', {cb: updatePlant}, modalKeypress);
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);
 
