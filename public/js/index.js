@@ -27,14 +27,17 @@ function buildSVG(){
 
   if(svg) svg.remove();
 
-  var [time, plantid, type] = getSelection();
+  // var [time, plantid, type] = getSelection();
+  var [lower, upper, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  // d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${lower}/${upper}`, function(Data){
     data = formatData(type, Data);
     if(!data) return;
 
-    setScales(time, data);
+    // setScales(time, data);
+    setScales(lower, upper, data);
 
     d3.select('div.svg')
       .append('svg')
@@ -53,7 +56,8 @@ function buildSVG(){
             .call(d3.axisBottom(xScale)
                         .tickSize(-height + 2*padding)
                         .tickSizeOuter(0)
-                        .tickFormat(d3.timeFormat(getTimeFormat(time))));
+                        .tickFormat(d3.timeFormat(getTimeFormat(lower, upper))));
+                        // .tickFormat(d3.timeFormat(getTimeFormat(time))));
 
     yAxis = svg
             .append('g')
@@ -156,25 +160,29 @@ function getYLabel(type){
   }
 }
 
-function getTimeFormat(time){
-  switch(time) {
-    case 1:
-      return '%H:%M';
-    case 2:
-      return '%H:%M';
-    case 12:
-      return '%H:%M';
-    case 24:
-      return '%H:%M';
-    case 72:
-      return '%m/%d - %H:%M';
-    case 168:
-      return '%m/%d - %H';
-    case 336:
-      return '%m/%d';
-    default:
-      return 'Error';
-  }
+// function getTimeFormat(time){
+function getTimeFormat(lower, upper){
+  var diff = upper - lower;
+  return (diff < 24*60*60*1000 && diff > 0) ? '%H:%M' :
+         (diff < 7*24*60*60*1000 && diff > 24*60*60*1000) ?  '%m/%d - %H' : '%m/%d - %H:%M';
+  // switch(time) {
+  //   case 1:
+  //     return '%H:%M';
+  //   case 2:
+  //     return '%H:%M';
+  //   case 12:
+  //     return '%H:%M';
+  //   case 24:
+  //     return '%H:%M';
+  //   case 72:
+  //     return '%m/%d - %H:%M';
+  //   case 168:
+  //     return '%m/%d - %H';
+  //   case 336:
+  //     return '%m/%d';
+  //   default:
+  //     return 'Error';
+  // }
 }
 
 function formatData(type, Data){
@@ -189,9 +197,12 @@ function formatData(type, Data){
   return Data;
 }
 
-function setScales(time, Data){
+// function setScales(time, Data){
+function setScales(lower, upper, Data){
   var now = new Date().getTime();
-  var prev = now - parseInt(time) * 60 * 60 * 1000;
+  // var prev = now - parseInt(time) * 60 * 60 * 1000;
+  lower = now + lower;
+  upper = now + upper;
 
   yScale = d3.scaleLinear()
                // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
@@ -200,28 +211,34 @@ function setScales(time, Data){
 
   xScale = d3.scaleTime()
               // .domain(d3.extent(data, d => d.created)) // Stretch available data across whole domain
-              .domain([prev, now])                        // Use time scale for width
+              .domain([lower, upper])                        // Use time scale for width
               .range([padding, width - padding]);
 }
 
 function getSelection(){
-  var time = $('div.time-pills a.selected').data('time');
+  // var time = $('div.time-pills a.selected').data('time');
+  var lower = $( "#slider-range" ).slider( "values", 0 );
+  var upper = $( "#slider-range" ).slider( "values", 1 );
   var plantid = $("select#plant-select option:selected").val();
   var type = $('div.type-pills a.selected').data('type');
-  return [time, plantid, type];
+  // return [time, plantid, type];
+  return [lower, upper, plantid, type];
 }
 
 function updateChart(){
   if(!isInitialized) buildSVG();
 
-  var [time, plantid, type] = getSelection();
+  // var [time, plantid, type] = getSelection();
+  var [lower, upper, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  // d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${lower}/${upper}`, function(Data){
     data = formatData(type, Data);
     if(!data) return;
 
-    setScales(time, data);
+    // setScales(time, data);
+    setScales(lower, upper, data);
 
     xAxis
       .transition()
@@ -229,7 +246,8 @@ function updateChart(){
       .call(d3.axisBottom(xScale)
                   .tickSize(-height + 2*padding)
                   .tickSizeOuter(0)
-                  .tickFormat(d3.timeFormat(getTimeFormat(time))));
+                  .tickFormat(d3.timeFormat(getTimeFormat(lower, upper))));
+                  // .tickFormat(d3.timeFormat(getTimeFormat(time))));
 
     yAxis
       .transition()
@@ -287,12 +305,12 @@ function loadAlerts(){
         });
 
         var str = "";
-        messages.forEach((message, index) => {
+        messages.reverse().forEach((message, index) => {
           date = new Date(message.created);
           str +=
           `
           <div class="alert alert-${ message.type } alert-dismissible fade show" role="alert" data-id="${ message._id }">
-            <small>${ date.getDate() }/${ date.getMonth() }/${ date.getFullYear() }:</small>
+            <small>${ date.getDate() }/${ date.getMonth()+1 }/${ date.getFullYear() }  -  ${ date.getHours() }:${ date.getMinutes() } :</small>
             <span>${ message.message }</span>
             <div class="alertButtons">
               <button type="button" class="close mr-4 px-2" data-dismiss="alert" aria-label="Close">
@@ -336,6 +354,20 @@ function registerButton(){
     });
 }
 
+function setSlider(event, ui){
+  var lower = new Date();
+  lower.setTime(lower.getTime() + ui.values[0]);
+  var lowerStr = `${ lower.getDate() }/${ lower.getMonth()+1 }/${ lower.getFullYear() } - ${ lower.getHours() }:${ lower.getMinutes() }`;
+  $( "#lower" ).html(lowerStr);
+
+  var upper = new Date();
+  upper.setTime(upper.getTime() + ui.values[1]);
+  var upperStr = `${ upper.getDate() }/${ upper.getMonth()+1 }/${ upper.getFullYear() } - ${ upper.getHours() }:${ upper.getMinutes() }`;
+  $( "#upper" ).html(upperStr);
+
+  updateChart();
+}
+
 $(document).ready(function(){
   $('div.empty').width($('div.type-pills').width()); // to center the svg
 
@@ -361,6 +393,19 @@ $(document).ready(function(){
       data: { checked: $('input#email').prop('checked'), user: $('a#navbarDropdown').data("uid") }
     });
   });
+
+  $( "#slider-range" ).slider({
+      range: true,
+      min: -7 * 24 * 60 * 60 * 1000,
+      max: 0,
+      values: [-7 * 24 * 60 * 60 * 1000, 0],
+      step: 60 * 60 * 1000,
+      slide: function( event, ui ) {
+        setSlider(event, ui);
+      }
+    });
+
+  setSlider(null, {values: [-7 * 24 * 60 * 60 * 1000, 0]});
 
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);

@@ -24,6 +24,18 @@ div.time-pills{
   width: 65%;
 }
 
+#slider-range{
+  margin-top: 0.35em;
+  width: 50%;
+}
+
+div.time{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
 div.plantSelect-registerButton{
   display: flex;
   flex-direction: row;

@@ -5,6 +5,7 @@ const callbacks       = require("./callbacks.js");
 
 // GET
 router.get("/log/:id/:time", callbacks.data.get.log);
+router.get("/log/:id/:lower/:upper", callbacks.data.get.log2);
 router.get("/plant", callbacks.data.get.plant);
 router.get("/message", callbacks.data.get.message);
 router.get("/default", callbacks.data.get.default);
