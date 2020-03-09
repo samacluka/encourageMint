@@ -122,17 +122,6 @@ callbacks.data.get.log = function(req,res){
   });
 }
 
-callbacks.data.get.log2 = function(req,res){
-  var now = new Date().getTime() / 1000;
-  var lower = now + Number(req.params.lower);
-  var upper = now + Number(req.params.upper);
-  var query = {plant: req.params.id, created: {$gt: lower, $lt: upper}};
-  Log.find(query).sort('created').exec((err, logs) => {
-    if (err) throw err;
-    res.send(logs);
-  });
-}
-
 callbacks.data.get.plant = function(req,res){
   var query = {};
   if(req.query.type === 'uid'){
