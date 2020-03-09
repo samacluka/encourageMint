@@ -122,6 +122,15 @@ callbacks.data.get.log = function(req,res){
   });
 }
 
+callbacks.data.get.log2 = function(req,res){
+  var query = {plant: req.params.id, created: {$gt: req.params.lower, $lt: req.params.upper}};
+
+  Log.find(query).sort('created').exec((err, logs) => {
+    if (err) throw err;
+    res.send(logs);
+  });
+}
+
 callbacks.data.get.plant = function(req,res){
   var query = {};
   if(req.query.type === 'uid'){
