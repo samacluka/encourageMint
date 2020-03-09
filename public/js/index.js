@@ -164,7 +164,8 @@ function getYLabel(type){
 function getTimeFormat(lower, upper){
   var diff = upper - lower;
   return (diff < 24*60*60*1000 && diff > 0) ? '%H:%M' :
-         (diff < 7*24*60*60*1000 && diff > 24*60*60*1000) ?  '%m/%d - %H' : '%m/%d - %H:%M';
+         (diff < 3*24*60*60*1000 && diff > 24*60*60*1000) ?  '%m/%d - %H:%M' :
+         (diff < 7*24*60*60*1000 && diff > 3*24*60*60*1000) ? '%m/%d - %H' : '%m/%d';
   // switch(time) {
   //   case 1:
   //     return '%H:%M';
@@ -199,10 +200,8 @@ function formatData(type, Data){
 
 // function setScales(time, Data){
 function setScales(lower, upper, Data){
-  var now = new Date().getTime();
+  // var now = new Date().getTime();
   // var prev = now - parseInt(time) * 60 * 60 * 1000;
-  lower = now + lower;
-  upper = now + upper;
 
   yScale = d3.scaleLinear()
                // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
@@ -217,8 +216,9 @@ function setScales(lower, upper, Data){
 
 function getSelection(){
   // var time = $('div.time-pills a.selected').data('time');
-  var lower = $( "#slider-range" ).slider( "values", 0 );
-  var upper = $( "#slider-range" ).slider( "values", 1 );
+  var now = new Date().getTime();
+  var lower = now + $( "#slider-range" ).slider( "values", 0 );
+  var upper = now + $( "#slider-range" ).slider( "values", 1 );
   var plantid = $("select#plant-select option:selected").val();
   var type = $('div.type-pills a.selected').data('type');
   // return [time, plantid, type];
@@ -394,6 +394,7 @@ $(document).ready(function(){
     });
   });
 
+  var debSetSlider = _.debounce(setSlider, 300);
   $( "#slider-range" ).slider({
       range: true,
       min: -7 * 24 * 60 * 60 * 1000,
@@ -401,7 +402,7 @@ $(document).ready(function(){
       values: [-7 * 24 * 60 * 60 * 1000, 0],
       step: 60 * 60 * 1000,
       slide: function( event, ui ) {
-        setSlider(event, ui);
+        debSetSlider(event, ui);
       }
     });
 
