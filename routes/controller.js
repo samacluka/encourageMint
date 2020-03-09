@@ -5,6 +5,7 @@ const callbacks       = require("./callbacks.js");
 
 // GET
 router.get("/getSetpoints", callbacks.controller.get.setpoints);
+router.get("/epoch", callbacks.controller.get.epoch);
 
 // POST
 router.post("/message", callbacks.controller.post.message);

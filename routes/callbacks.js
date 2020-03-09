@@ -243,6 +243,10 @@ callbacks.controller.get.setpoints = function(req,res){
   });
 };
 
+callbacks.controller.get.epoch = function(req,res){
+  res.send(JSON.stringify({epoch: Math.floor(new Date().getTime() / 1000)}));
+}
+
 // POST
 callbacks.controller.post.message = function(req,res){
   try {
