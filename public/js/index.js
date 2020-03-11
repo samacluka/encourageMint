@@ -350,8 +350,21 @@ $(document).ready(function(){
   setTimeout(registerButton, 200);
 
   $('button#registerPlant').on('click', function(event){
-    $.post( "/config/new", { plant: $('select#plant-select').val() });
+    var plantid = $('select#plant-select').val();
+    $.post("/config/new", { plant: plantid });
     $(this).hide({duration: 400});
+    $(this).html('Connect Plant');
+    setTimeout(function(){
+      $.get("/config/success", { plant: plantid })
+        .done(function( data ){
+          [data] = JSON.parse(data); // Convert string to JSON Remove array wrapper
+          if(!data.success){
+            $(`select#plant-select option[value="${ plantid }"]`).prop('selected',true);
+            $('button#registerPlant').html('<small>Association Failed. Please Try Connecting Again</small>');
+            $('button#registerPlant').show({duration:400});
+          }
+        });
+    }, 5.5 * 60 * 1000); // 5.5 minutes after button click
   });
 
   $('input#email').on('click', function(){
