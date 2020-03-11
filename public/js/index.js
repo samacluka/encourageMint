@@ -343,11 +343,10 @@ $(document).ready(function(){
   $('div.time-pills a').on('click', {str: 'time'}, selectPill);
   $('select#plant-select').on('change', function(event){
     event.stopPropagation();
-    updateChart();
     registerButton();
     loadAlerts();
+    updateChart();
   });
-  setTimeout(registerButton, 200);
 
   $('button#registerPlant').on('click', function(event){
     var plantid = $('select#plant-select').val();
@@ -378,6 +377,7 @@ $(document).ready(function(){
   var debBuildSVG = _.debounce(buildSVG, 300);
   $(window).on('resize', debBuildSVG);
 
+  setTimeout(registerButton, 200);
   setTimeout(loadAlerts, 200);
   setTimeout(buildSVG, 200);
 
