@@ -356,7 +356,7 @@ callbacks.config.post.new = function(req,res){
     } else{ // From webapp
       Plant.findById(req.body.plant, (err, foundPlant) => {
         if(err) throw err;
-        if(foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
+        if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
         if(foundConfig){ // Second to hit route
           console.log("Web app was second to route");
 
