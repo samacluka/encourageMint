@@ -147,8 +147,13 @@
               <div class="form-group row">
                 <label for="newPlantType" class="col-form-label col-3">Type:</label>
                 <select class="form-control col" name="plant-type" id="newPlantType">
-                  <option value="Mint" slected>Mint</option>
-                  <option value="Basil">Basil</option>
+                  <% defaults.forEach((d,i,a) => { %>
+                    <% if(i === 0){ %>
+                      <option value="<%= d.type %>" selected><%= d.type %></option>
+                    <% } else { %>
+                      <option value="<%= d.type %>"><%= d.type %></option>
+                    <% } %>
+                  <% }); %>
                 </select>
               </div>
               <hr class="style-two">
@@ -196,8 +201,13 @@
               <div class="form-group row">
                 <label for="updatePlantType" class="col-form-label col-3">Type:</label>
                 <select class="form-control col" name="plant-type" id="updatePlantType">
-                  <option value="Mint">Mint</option>
-                  <option value="Basil">Basil</option>
+                  <% defaults.forEach((d,i,a) => { %>
+                    <% if(i === 0){ %>
+                      <option value="<%= d.type %>" selected><%= d.type %></option>
+                    <% } else { %>
+                      <option value="<%= d.type %>"><%= d.type %></option>
+                    <% } %>
+                  <% }); %>
                 </select>
               </div>
               <hr class="style-two">
