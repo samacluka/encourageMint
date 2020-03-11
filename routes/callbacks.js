@@ -350,24 +350,19 @@ callbacks.config.post.new = function(req,res){
           if(err) throw err;
           foundConfig.success = true;
           foundConfig.mc = mcid;
-          foundConfig.save().then((savedConfig) => {
-            foundPlant.mc = mcid;
-            foundPlant.save().then((savedPlant) => {
-              console.log('Microcontroller finished config');
-              return res.send(mcidJSON);
-            });
-          });
+          foundConfig.save();
+
+          foundPlant.mc = mcid;
+          foundPlant.save();
+
+          console.log('Microcontroller finished config');
+          return res.send(mcidJSON);
         });
       } else { // First to hit route
         console.log("Microcontroller was first to route");
-        Config.create({
-          mc: mcid,
-          ip: reqIp
-        },(err, newConfig) => {
-          if(err) throw err;
-          console.log('Microcontroller started config');
-          return res.send(mcidJSON);
-        });
+        Config.create({ mc: mcid, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
+        console.log('Microcontroller started config');
+        return res.send(mcidJSON);
       }
     } else{ // From webapp
       Plant.findById(req.body.plant, (err, foundPlant) => {
@@ -377,23 +372,18 @@ callbacks.config.post.new = function(req,res){
           console.log("Web app was second to route");
           foundConfig.success = true;
           foundConfig.plant = req.body.plant;
-          foundConfig.save().then((savedConfig) => {
-            foundPlant.mc = foundConfig.mc;
-            foundPlant.save().then((savedPlant) => {
-              console.log('Web App finished config');
-              return res.end();
-            });
-          });
+          foundConfig.save();
+
+          foundPlant.mc = foundConfig.mc;
+          foundPlant.save();
+
+          console.log('Web App finished config');
+          return res.end();
         } else { // First
           console.log("Web app was first to route");
-          Config.create({
-            plant: req.body.plant,
-            ip: reqIp
-          }, (err,newConfig) => {
-            if(err) throw err;
-            console.log('Web app started config');
-            return res.end();
-          });
+          Config.create({ plant: req.body.plant, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
+          console.log('Web app started config');
+          return res.end();
         }
       });
     }
