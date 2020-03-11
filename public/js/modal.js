@@ -21,8 +21,8 @@ async function updateSelects(plantid=-1){
      }
   });
   // Timeout need so the select has time to load data
-  setTimeout(loadAlerts, 200); // function from ./index.js
-  setTimeout(registerButton, 200); // function from ./index.js
+  setTimeout(loadAlerts, 300); // function from ./index.js
+  setTimeout(registerButton, 300); // function from ./index.js
   return Promise.resolve(numPlants); // calling this function returns the number of plants before any addition or deletion even
 }
 
