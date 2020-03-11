@@ -3,7 +3,10 @@ const express = require("express"),
 
 const callbacks       = require("./callbacks.js");
 
-// LOGOUT
+// GET
+router.get("/success", callbacks.config.get.success);
+
+// POST
 router.post("/new", callbacks.config.post.new);
 
 module.exports = router;

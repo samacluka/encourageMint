@@ -53,6 +53,7 @@ var callbacks = {
   controller: {
     get: {
       // setpoints
+      // epoch
     },
     post: {
       // message
@@ -62,6 +63,9 @@ var callbacks = {
     }
   },
   config: {
+    get: {
+      // success
+    },
     post:{
       // new
     }
@@ -307,6 +311,18 @@ callbacks.controller.put.logs = function(req,res){
 };
 
 // ======================================== CONFIGURATION ========================================
+// GET
+callbacks.config.get.success = function(req,res){
+  if(req.body.mc){
+    var query = { mc: req.body.mc };
+  } else if(req.query.plant){
+    var query = { plant: req.query.plant };
+  }
+
+  Config.find(query, function(err, foundConfig){
+    res.send(JSON.stringify(foundConfig));
+  });
+}
 
 // POST
 callbacks.config.post.new = function(req,res){
@@ -332,11 +348,11 @@ callbacks.config.post.new = function(req,res){
         console.log("Microcontroller was second to route");
         Plant.findById(foundConfig.plant, (err, foundPlant) => {
           if(err) throw err;
-
-          foundPlant.mc = mcid;
-          foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ip: reqIp}, (err) => {
-              if(err) throw err;
+          foundConfig.success = true;
+          foundConfig.mc = mcid;
+          foundConfig.save().then((savedConfig) => {
+            foundPlant.mc = mcid;
+            foundPlant.save().then((savedPlant) => {
               console.log('Microcontroller finished config');
               return res.send(mcidJSON);
             });
@@ -359,11 +375,11 @@ callbacks.config.post.new = function(req,res){
         if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
         if(foundConfig){ // Second to hit route
           console.log("Web app was second to route");
-
-          foundPlant.mc = foundConfig.mc;
-          foundPlant.save().then((savedPlant) => {
-            Config.deleteOne({ip: reqIp}, (err) => {
-              if(err) throw err;
+          foundConfig.success = true;
+          foundConfig.plant = req.body.plant;
+          foundConfig.save().then((savedConfig) => {
+            foundPlant.mc = foundConfig.mc;
+            foundPlant.save().then((savedPlant) => {
               console.log('Web App finished config');
               return res.end();
             });
