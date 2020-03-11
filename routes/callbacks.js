@@ -340,24 +340,25 @@ callbacks.config.post.new = function(req,res){
 
   Config.findOne(query, (err, foundConfig) => {
     if(err) throw err;
+    if(foundConfig && foundConfig.success) return res.end() // stop if config is already successfully associated
 
     if(!req.body.plant){ // From Microcontroller
       var mcid = genUID();
       var mcidJSON = JSON.stringify({id: mcid});
       if(foundConfig){ // Second to hit route
         console.log("Microcontroller was second to route");
-        Plant.findById(foundConfig.plant, (err, foundPlant) => {
-          if(err) throw err;
-          foundConfig.success = true;
-          foundConfig.mc = mcid;
-          foundConfig.save();
+        foundConfig.success = true;
+        foundConfig.mc = mcid;
+        foundConfig.save();
 
-          foundPlant.mc = mcid;
-          foundPlant.save();
+          Plant.findById(foundConfig.plant, (err, foundPlant) => {
+            if(err) throw err;
+            foundPlant.mc = mcid;
+            foundPlant.save();
+          });
 
-          console.log('Microcontroller finished config');
-          return res.send(mcidJSON);
-        });
+        console.log('Microcontroller finished config');
+        return res.send(mcidJSON);
       } else { // First to hit route
         console.log("Microcontroller was first to route");
         Config.create({ mc: mcid, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
@@ -365,27 +366,27 @@ callbacks.config.post.new = function(req,res){
         return res.send(mcidJSON);
       }
     } else{ // From webapp
-      Plant.findById(req.body.plant, (err, foundPlant) => {
-        if(err) throw err;
-        if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
-        if(foundConfig){ // Second to hit route
-          console.log("Web app was second to route");
-          foundConfig.success = true;
-          foundConfig.plant = req.body.plant;
-          foundConfig.save();
+      if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
+      if(foundConfig){ // Second to hit route
+        console.log("Web app was second to route");
+        foundConfig.success = true;
+        foundConfig.plant = req.body.plant;
+        foundConfig.save();
 
+        Plant.findById(req.body.plant, (err, foundPlant) => {
+          if(err) throw err;
           foundPlant.mc = foundConfig.mc;
           foundPlant.save();
+        });
 
-          console.log('Web App finished config');
-          return res.end();
-        } else { // First
-          console.log("Web app was first to route");
-          Config.create({ plant: req.body.plant, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
-          console.log('Web app started config');
-          return res.end();
-        }
-      });
+        console.log('Web App finished config');
+        return res.end();
+      } else { // First
+        console.log("Web app was first to route");
+        Config.create({ plant: req.body.plant, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
+        console.log('Web app started config');
+        return res.end();
+      }
     }
   });
 }
