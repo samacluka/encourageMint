@@ -15,6 +15,8 @@ var title;
 var svg;
 var line;
 var lineWidth = 4;
+var maxThreshold;
+var minThreshold;
 
 var data;
 
@@ -74,6 +76,52 @@ function buildSVG(){
                 .x(function(d){ return xScale(d.created); })
                 .y(function(d){ return yScale(d.desired); })
               );
+
+    $.ajax({ type: "GET",
+        url: '/data/default',
+        data: { type: $('select#updatePlantType').val() },
+        async: true,
+        success : function(defaultPlant){
+          defaultPlant = formatDefaultData(type, time, defaultPlant);
+          maxThreshold = svg
+                          .append('path')
+                          .datum(defaultPlant)
+                            .attr('fill', 'none')
+                            .attr('stroke', '#4e5f70e8')
+                            .attr('stroke-width', lineWidth-2)
+                            .attr('stroke-dasharray', '25,5');
+
+          minThreshold = svg
+                          .append('path')
+                          .datum(defaultPlant)
+                            .attr('fill', 'none')
+                            .attr('stroke', '#4e5f70e8')
+                            .attr('stroke-width', lineWidth-2)
+                            .attr('stroke-dasharray', '25,5');
+
+          try {
+            maxThreshold
+              .attr('d', d3.line()
+                .x(function(d){ return xScale(d.created); })
+                .y(function(d){ return yScale(d.desired.max); })
+              );
+
+            minThreshold
+              .attr('d', d3.line()
+                .x(function(d){ return xScale(d.created); })
+                .y(function(d){ return yScale(d.desired.min); })
+              );
+
+          } catch (e) {
+              if(e.name === 'TypeError'){
+                maxThreshold.attr('d', '');
+                minThreshold.attr('d', '');
+              } else {
+                console.log(e);
+              }
+          }
+        }
+      });
 
     // Set title
     title = svg
@@ -189,13 +237,30 @@ function formatData(type, Data){
   return Data;
 }
 
+function formatDefaultData(type, time, [defaultPlant]){
+  // remove array wrapper in function def
+  var now = new Date().getTime();
+  var prev = now - parseInt(time) * 60 * 60 * 1000;
+
+  var arr = [];
+  var domain = [prev, now];
+  domain.forEach(function(d,i){
+    arr.push({
+      created: d,
+      desired: type === 'soilMoisture' ? defaultPlant.soilMoisture :
+               type === 'light' ? defaultPlant.lightThreshold : null
+    });
+  });
+  return arr;
+}
+
 function setScales(time, Data){
   var now = new Date().getTime();
   var prev = now - parseInt(time) * 60 * 60 * 1000;
 
   yScale = d3.scaleLinear()
                // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
-               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+10/(a[1]-a[0]) : x-10/(a[1]-a[0])))  // Add padding to data range inversely purportional to original range
+               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] || 1) : x-20/(a[1]-a[0] || 1)))  // Add padding to data range inversely purportional to original range
                .range([height - padding, padding]);
 
   xScale = d3.scaleTime()
@@ -242,13 +307,53 @@ function updateChart(){
       .datum(data)
         .transition()
         .duration(1000)
-        .attr('fill', 'none')
         .attr('stroke', color(type))
-        .attr('stroke-width', lineWidth)
         .attr('d', d3.line()
           .x(function(d){ return xScale(d.created); })
           .y(function(d){ return yScale(d.desired); })
         );
+
+    $.ajax({ type: "GET",
+        url: '/data/default',
+        data: { type: $('select#updatePlantType').val() },
+        async: true,
+        success : function(defaultPlant){
+          defaultPlant = formatDefaultData(type, time, defaultPlant);
+          try {
+            maxThreshold
+              .datum(defaultPlant)
+                .transition()
+                .duration(1000)
+                .attr('d', d3.line()
+                  .x(function(d){ return xScale(d.created); })
+                  .y(function(d){ return yScale(d.desired.max); })
+                );
+
+            minThreshold
+              .datum(defaultPlant)
+                .transition()
+                .duration(1000)
+                .attr('d', d3.line()
+                  .x(function(d){ return xScale(d.created); })
+                  .y(function(d){ return yScale(d.desired.min); })
+                );
+          } catch (e) {
+            if(e.name === 'TypeError'){
+              maxThreshold
+                .transition()
+                .duration(1000)
+                .attr('d','');
+
+              minThreshold
+                .transition()
+                .duration(1000)
+                .attr('d','');
+            } else {
+              console.log(e);
+            }
+          }
+        }
+      });
 
     // Update Title
     title
