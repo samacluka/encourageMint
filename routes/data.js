@@ -15,6 +15,8 @@ router.post("/newPlant", callbacks.data.post.newPlant);
 // PUT
 router.put("/notifications", callbacks.data.put.notifications);
 router.put("/updatePlant", callbacks.data.put.updatePlant);
+router.put("/swap/logs", callbacks.data.put.swap.logs);
+router.put("/swap/logs", callbacks.data.put.duplicate.logs);
 
 // DELETE
 router.delete("/message", callbacks.data.delete.message);

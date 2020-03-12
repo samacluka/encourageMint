@@ -45,6 +45,12 @@ var callbacks = {
     put: {
       // notifications
       // updatePlant
+      swap:{
+        // logs
+      },
+      duplicate:{
+        // logs
+      }
     },
     delete: {
       // message
@@ -174,9 +180,9 @@ callbacks.data.post.newPlant = function(req, res){
     };
 
   Plant.create(PlantObj, (err, newPlant) => {
-          if(err) throw err;
-          res.send(newPlant);
-        });
+    if(err) throw err;
+    res.send(newPlant);
+  });
 }
 
 // PUT
@@ -211,6 +217,28 @@ callbacks.data.put.updatePlant = function(req, res){
                   console.log(e);
                   res.end();
                 });
+  });
+}
+
+callbacks.data.put.swap.logs = function(req,res){
+  Log.find({plant: req.body.from}, function(err, foundLogs){
+    if(err) throw err;
+    foundLogs.forEach(async function(d,i,l){
+      d.plant = req.body.to;
+      await d.save();
+    });
+    res.end();
+  });
+}
+
+callbacks.data.put.duplicate.logs = function(req,res){
+  Log.find({plant: req.body.from}, function(err, foundLogs){
+    if(err) throw err;
+    foundLogs.forEach(async function(d,i,l){
+      d.plant = req.body.to;
+      await Log.create(d);
+    });
+    res.end();
   });
 }
 
