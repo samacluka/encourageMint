@@ -131,6 +131,11 @@ callbacks.data.get.log = function(req,res){
 
   Log.find(query).sort('created').exec((err, logs) => {
     if (err) throw err;
+    if(logs.length > 500){
+      logs = logs.filter((l, i, a) => {
+        return(!(i%(10 - req.params.time/24) === 0));
+      });
+    }
     res.send(logs);
   });
 }
