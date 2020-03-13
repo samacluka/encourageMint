@@ -260,7 +260,7 @@ function setScales(time, Data){
 
   yScale = d3.scaleLinear()
                // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
-               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] || 1) : x-20/(a[1]-a[0] || 1)))  // Add padding to data range inversely purportional to original range
+               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)))  // Add padding to data range inversely purportional to original range // padding can range from +/- 20 to +/- 100
                .range([height - padding, padding]);
 
   xScale = d3.scaleTime()
