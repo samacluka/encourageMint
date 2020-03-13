@@ -360,10 +360,6 @@ callbacks.config.get.success = function(req,res){
 // POST
 callbacks.config.post.new = function(req,res){
   var time = new Date();
-  time.setTime(time.getTime()- 7 * 24 * 60 * 60 * 1000); // One week ago
-  Config.deleteMany({created: {$lt: time}}); //Delete any configs older than a week
-
-  var time = new Date();
   time.setTime(time.getTime() - 5 * 60 * 1000); // 5 minutes ago
 
   reqIp = req.clientIp.split('.')[0] + req.clientIp.split('.')[1]; // concat first two elements of ip
