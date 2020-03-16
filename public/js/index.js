@@ -470,6 +470,14 @@ $(document).ready(function(){
         });
     }, 5.5 * 60 * 1000); // 5.5 minutes after button click
   });
+  $('#deleteAllMessages').on('click', function(event){
+    $('div.alert').alert('close');
+    $.ajax({ type: "DELETE",
+        url: '/data/message/all',
+        data: { plant: $('select#plant-select').val() },
+        async: true,
+    });
+  });
 
   $('input#email').on('click', function(){
     $.ajax({

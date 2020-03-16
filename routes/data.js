@@ -20,6 +20,7 @@ router.put("/swap/logs", callbacks.data.put.duplicate.logs);
 
 // DELETE
 router.delete("/message", callbacks.data.delete.message);
+router.delete("/message/all", callbacks.data.delete.messages);
 router.delete("/deletePlant", callbacks.data.delete.plant);
 
 module.exports = router;
