@@ -198,7 +198,7 @@ function getYLabel(type){
     case "soilMoisture":
       return 'Soil Moisture (g/kg)';
     case "light":
-      return 'Light Initensity (lm)';
+      return 'Light Hours (Hrs)';
     default:
       return 'Error';
   }
