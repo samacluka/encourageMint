@@ -1,3 +1,35 @@
+function dataValidation(from){
+    var plantid = $('select#update-plant-select').val(),
+    Name = $(`input#${from}PlantName`).val(),
+    Type = $(`select#${from}PlantType`).val(),
+    Owner = $(`a#navbarDropdown`).data("uid"),
+    soilMoistureMin = $(`input#${from}SoilMoistureMin`).val(),
+    soilMoistureMax = $(`input#${from}SoilMoistureMax`).val(),
+    lightThresholdMin = $(`input#${from}LightMin`).val(),
+    lightThresholdMax = $(`input#${from}LightMax`).val();
+
+    if(lightThresholdMin > 24 || lightThresholdMin < 0) return null;
+    if(lightThresholdMax > 24 || lightThresholdMax < 0) return null;
+    if(lightThresholdMax < lightThresholdMin) return null;
+
+    if(soilMoistureMax > 850 || soilMoistureMax < 375) return null;
+    if(soilMoistureMin > 850 || soilMoistureMin < 375) return null;
+    if(soilMoistureMax < soilMoistureMin) return null;
+
+    if(Name === "") return null;
+
+    return({
+      plantid: plantid,
+      Name: Name,
+      Type: Type,
+      Owner: Owner,
+      soilMoistureMin: soilMoistureMin,
+      soilMoistureMax: soilMoistureMax,
+      lightThresholdMin: lightThresholdMin,
+      lightThresholdMax: lightThresholdMax
+    });
+}
+
 async function updateSelects(plantid=-1){
   var numPlants;
   await $.ajax({ type: "GET",
@@ -27,38 +59,27 @@ async function updateSelects(plantid=-1){
 }
 
 function newPlant(){
-  $.post( "/data/newPlant", {
-                        Name: $('input#newPlantName').val(),
-                        Type: $('select#newPlantType').val(),
-                        Owner: $('a#navbarDropdown').data("uid"),
-                        soilMoistureMin: $('input#newSoilMoistureMin').val(),
-                        soilMoistureMax: $('input#newSoilMoistureMax').val(),
-                        lightThresholdMin: $('input#newLightMin').val(),
-                        lightThresholdMax: $('input#newLightMax').val()
-                      }
-        ).done(function( result ){
-          $('div#newPlantModal input').val('');
-          $('select#newPlantType').prop('selectedIndex',0);
-          updateSelects(result._id).then((numPlants) => {
-            if(numPlants === 1) location.reload();
-          });
-        });
+  var data = dataValidation('new');
+  if(!data) return;
+  $('#newPlantModal').modal('hide');
+  $.post( "/data/newPlant", data)
+    .done(function( result ){
+      $('div#newPlantModal input').val('');
+      $('select#newPlantType').prop('selectedIndex',0);
+      updateSelects(result._id).then((numPlants) => {
+        if(numPlants === 1) location.reload();
+      });
+    });
 }
 
 function updatePlant(){
+  var data = dataValidation('update');
+  if(!data) return;
+  $('#updatePlantModal').modal('hide');
   $.ajax({
     url: '/data/updatePlant',
     type: 'PUT',
-    data: {
-            plantid: $('select#update-plant-select').val(),
-            Name: $('input#updatePlantName').val(),
-            Type: $('select#updatePlantType').val(),
-            Owner: $('a#navbarDropdown').data("uid"),
-            soilMoistureMin: $('input#updateSoilMoistureMin').val(),
-            soilMoistureMax: $('input#updateSoilMoistureMax').val(),
-            lightThresholdMin: $('input#updateLightMin').val(),
-            lightThresholdMax: $('input#updateLightMax').val()
-          },
+    data: data,
     success: function(result) {
       updateSelects($('select#update-plant-select').val());
     }
@@ -123,7 +144,6 @@ function modalKeypress(event) {
   var keycode = (event.keyCode ? event.keyCode : event.which);
   if(keycode == '13'){
      event.data.cb();
-     $(this).modal('hide');
   }
 }
 

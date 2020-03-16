@@ -159,8 +159,8 @@
               <hr class="style-two">
               <div class="form-group row">
                 <label class="col-form-label col-4">Soil Mositure:</label>
-                <input type="number" class="form-control col-3" id="newSoilMoistureMin" placeholder="min">
-                <input type="number" class="form-control col-3" id="newSoilMoistureMax" placeholder="max">
+                <input type="number" class="form-control col-3" id="newSoilMoistureMin" placeholder="min" min="375" max="850">
+                <input type="number" class="form-control col-3" id="newSoilMoistureMax" placeholder="max" min="375" max="850">
               </div>
               <div class="form-group row">
                 <label class="col-form-label col-4">Light Hours:</label>
@@ -170,7 +170,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" id="newPlantSubmit" data-dismiss="modal">Save New Plant</button>
+            <button type="button" class="btn btn-success" id="newPlantSubmit">Save New Plant</button>
           </div>
         </div>
       </div>
@@ -213,8 +213,8 @@
               <hr class="style-two">
               <div class="form-group row">
                 <label class="col-form-label col-4">Soil Mositure:</label>
-                <input type="number" class="form-control col-3" id="updateSoilMoistureMin" placeholder="min">
-                <input type="number" class="form-control col-3" id="updateSoilMoistureMax" placeholder="max">
+                <input type="number" class="form-control col-3" id="updateSoilMoistureMin" placeholder="min" min="375" max="850">
+                <input type="number" class="form-control col-3" id="updateSoilMoistureMax" placeholder="max" min="375" max="850">
               </div>
               <div class="form-group row">
                 <label class="col-form-label col-4">Light Hours:</label>
@@ -225,7 +225,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" id="deletePlant" data-dismiss="modal">Delete Plant</button>
-            <button type="button" class="btn btn-primary" id="updatePlantSubmit" data-dismiss="modal">Save changes</button>
+            <button type="button" class="btn btn-primary" id="updatePlantSubmit">Save changes</button>
           </div>
         </div>
       </div>
