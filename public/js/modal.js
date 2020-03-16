@@ -1,33 +1,54 @@
+function addAlertBullet(message){
+  $('#alertModalList').append(`<li>${message}</li>`);
+  return 1;
+}
+
+function showAlertModal(from){
+  $(`#alertModal`).unbind('hide.bs.modal'); // Remove any previously set functionalities
+  $(`#alertModal`).on('hide.bs.modal', function (e) {
+      $(`#${from}PlantModal`).modal('show'); // Re show 'from' modal when alert modal closes
+      $('#alertModalList').html(''); // Clear the list
+  });
+  $(`#${from}PlantModal`).modal('hide'); // hide 'from' modal
+  $('#alertModal').modal('show'); // Show alert modal
+}
+
 function dataValidation(from){
-    var plantid = $('select#update-plant-select').val(),
-    Name = $(`input#${from}PlantName`).val(),
-    Type = $(`select#${from}PlantType`).val(),
-    Owner = $(`a#navbarDropdown`).data("uid"),
-    soilMoistureMin = $(`input#${from}SoilMoistureMin`).val(),
-    soilMoistureMax = $(`input#${from}SoilMoistureMax`).val(),
-    lightThresholdMin = $(`input#${from}LightMin`).val(),
-    lightThresholdMax = $(`input#${from}LightMax`).val();
+    var obj = {
+                plantid: $('select#update-plant-select').val(),
+                Name: $(`input#${from}PlantName`).val(),
+                Type: $(`select#${from}PlantType`).val(),
+                Owner: $(`a#navbarDropdown`).data("uid"),
+                soilMoistureMin: $(`input#${from}SoilMoistureMin`).val(),
+                soilMoistureMax: $(`input#${from}SoilMoistureMax`).val(),
+                lightThresholdMin: $(`input#${from}LightMin`).val(),
+                lightThresholdMax: $(`input#${from}LightMax`).val()
+              };
 
-    if(lightThresholdMin > 24 || lightThresholdMin < 0) return null;
-    if(lightThresholdMax > 24 || lightThresholdMax < 0) return null;
-    if(lightThresholdMax < lightThresholdMin) return null;
+    var numMessages = 0;
 
-    if(soilMoistureMax > 850 || soilMoistureMax < 375) return null;
-    if(soilMoistureMin > 850 || soilMoistureMin < 375) return null;
-    if(soilMoistureMax < soilMoistureMin) return null;
+    if(obj.Name === "") numMessages += addAlertBullet('Name must not be blank');
 
-    if(Name === "") return null;
+    if(obj.Name.length > 17) numMessages += addAlertBullet('Name must be less than 16 characters');
 
-    return({
-      plantid: plantid,
-      Name: Name,
-      Type: Type,
-      Owner: Owner,
-      soilMoistureMin: soilMoistureMin,
-      soilMoistureMax: soilMoistureMax,
-      lightThresholdMin: lightThresholdMin,
-      lightThresholdMax: lightThresholdMax
-    });
+    if(obj.lightThresholdMin > 24 || obj.lightThresholdMin < 0) numMessages += addAlertBullet('Minimum light hours must be between 0 and 24 hours');
+
+    if(obj.lightThresholdMax > 24 || obj.lightThresholdMax < 0) numMessages += addAlertBullet('Maximum light hours must be between 0 and 24 hours');
+
+    if(obj.lightThresholdMax < obj.lightThresholdMin) numMessages += addAlertBullet('Maximum Light Hours must be greater than or equal to Minimum Light Hours');
+
+    if(obj.soilMoistureMax > 850 || obj.soilMoistureMax < 375) numMessages += addAlertBullet('Maximum Soil Moisture must be between 375 and 850');
+
+    if(obj.soilMoistureMin > 850 || obj.soilMoistureMin < 375) numMessages += addAlertBullet('Minimum Soil Moisture must be between 375 and 850');
+
+    if(obj.soilMoistureMax < obj.soilMoistureMin) numMessages += addAlertBullet('Maximum Soil Moisture must be greater than or equal to Minimum Soil Moisture');
+
+    if(numMessages > 0){
+      showAlertModal(from);
+      return null;
+    }
+
+    return(obj);
 }
 
 async function updateSelects(plantid=-1){
