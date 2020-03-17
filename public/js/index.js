@@ -473,7 +473,7 @@ $(document).ready(function(){
   $('#deleteAllMessages').on('click', function(event){
     $('div.alert').alert('close');
     $.ajax({ type: "DELETE",
-        url: '/data/message/all',
+        url: '/data/allMessage',
         data: { plant: $('select#plant-select').val() },
         async: true,
     });

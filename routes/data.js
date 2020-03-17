@@ -20,7 +20,7 @@ router.put("/updatePlant", is.LoggedIn, callbacks.data.put.updatePlant);
 
 // DELETE
 router.delete("/message", is.LoggedIn, callbacks.data.delete.message);
-router.delete("/message/all", is.LoggedIn, callbacks.data.delete.messages);
+router.delete("/allMessage", is.LoggedIn, callbacks.data.delete.allMessages);
 router.delete("/deletePlant", is.LoggedIn, callbacks.data.delete.plant);
 
 module.exports = router;

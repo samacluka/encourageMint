@@ -231,7 +231,7 @@ callbacks.data.delete.message = function(req,res){
   });
 }
 
-callbacks.data.delete.messages = function(req, res){
+callbacks.data.delete.allMessages = function(req, res){
   Message.deleteMany({plant: req.body.plant}, (err) => {
     if(err) throw err;
     res.end();
