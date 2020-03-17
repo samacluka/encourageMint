@@ -101,15 +101,13 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== INDEX ========================================
 // GET
 callbacks.index.get.landing = function(req,res){
-  if(req.isAuthenticated()){
-    res.redirect('/index');
-  } else {
-    res.render(views.index.landing);
-  }
+  if(req.isAuthenticated()) res.redirect('/index');
+  res.render(views.index.landing);
 };
 
 callbacks.index.get.index = function(req,res){
   console.log('================ '+req.clientIp+' ================');
+  if(!req.isAuthenticated()) res.redirect('/');
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if(err) throw err;
     Default.find({}, (err, foundDefaults) => {
