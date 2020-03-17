@@ -223,28 +223,6 @@ callbacks.data.put.updatePlant = function(req, res){
   });
 }
 
-callbacks.data.put.swap.logs = function(req,res){
-  Log.find({plant: req.body.from}, function(err, foundLogs){
-    if(err) throw err;
-    foundLogs.forEach(async function(d,i,l){
-      d.plant = req.body.to;
-      await d.save();
-    });
-    res.end();
-  });
-}
-
-callbacks.data.put.duplicate.logs = function(req,res){
-  Log.find({plant: req.body.from}, function(err, foundLogs){
-    if(err) throw err;
-    foundLogs.forEach(async function(d,i,l){
-      d.plant = req.body.to;
-      await Log.create(d);
-    });
-    res.end();
-  });
-}
-
 // DELETE
 callbacks.data.delete.message = function(req,res){
   Message.deleteOne({_id: req.body.id}, (err) => {

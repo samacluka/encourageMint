@@ -17,8 +17,6 @@ router.post("/newPlant", is.LoggedIn, callbacks.data.post.newPlant);
 // PUT
 router.put("/notifications", is.LoggedIn, callbacks.data.put.notifications);
 router.put("/updatePlant", is.LoggedIn, callbacks.data.put.updatePlant);
-router.put("/swap/logs", callbacks.data.put.swap.logs);
-router.put("/swap/logs", callbacks.data.put.duplicate.logs);
 
 // DELETE
 router.delete("/message", is.LoggedIn, callbacks.data.delete.message);
