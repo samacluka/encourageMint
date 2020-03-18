@@ -1,5 +1,3 @@
-var User        = require("../models/user");
-
 var is = {};
 
 is.LoggedIn = function(req,res,next){
