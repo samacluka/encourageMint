@@ -1,19 +1,6 @@
-function addAlertBullet(message){
-  $('#alertModalList').append(`<li>${message}</li>`);
-  return 1;
-}
-
-function showAlertModal(from){
-  $(`#alertModal`).unbind('hide.bs.modal'); // Remove any previously set functionalities
-  $(`#alertModal`).on('hide.bs.modal', function (e) {
-      $(`#${from}PlantModal`).modal('show'); // Re show 'from' modal when alert modal closes
-      $('#alertModalList').html(''); // Clear the list
-  });
-  $(`#${from}PlantModal`).modal('hide'); // hide 'from' modal
-  $('#alertModal').modal('show'); // Show alert modal
-}
-
 function dataValidation(from){
+  $('[data-toggle="tooltip"]').tooltip('hide'); // hide all tooltips
+
     var obj = {
                 plantid: $('select#update-plant-select').val(),
                 Name: $(`input#${from}PlantName`).val(),
@@ -25,27 +12,24 @@ function dataValidation(from){
                 lightThresholdMax: Number($(`input#${from}LightMax`).val())
               };
 
-    var numMessages = 0;
+    var numMessages = "";
 
-    if(obj.Name === "") numMessages += addAlertBullet('Name must not be blank');
-    if(obj.Name.length > 17) numMessages += addAlertBullet('Name must be less than 16 characters');
+    if(obj.Name === "") numMessages = $(`#${from}PlantNameTooltip`).attr('data-original-title','Name must not be blank').tooltip('show');
+    if(obj.Name.length > 17) numMessages = $(`#${from}PlantNameTooltip`).attr('data-original-title','Name must be less than 16 characters').tooltip('show');
 
-    if(obj.lightThresholdMin > 24) numMessages += addAlertBullet('Minimum light hours must be less than 24');
-    if(obj.lightThresholdMin < 0) numMessages += addAlertBullet('Minimum light hours must be greater than 0');
-    if(obj.lightThresholdMax > 24) numMessages += addAlertBullet('Maximum light hours must be less than 24');
-    if(obj.lightThresholdMax < 0) numMessages += addAlertBullet('Maximum light hours must be greater than 0');
-    if(obj.lightThresholdMax < obj.lightThresholdMin) numMessages += addAlertBullet('Maximum Light Hours must be greater than or equal to Minimum Light Hours');
+    if(obj.lightThresholdMin > 24) numMessages = $(`#${from}LightMinTooltip`).attr('data-original-title','Minimum light hours must be less than 24').tooltip('show');
+    if(obj.lightThresholdMin < 0) numMessages = $(`#${from}LightMinTooltip`).attr('data-original-title','Minimum light hours must be greater than 0').tooltip('show');
+    if(obj.lightThresholdMax > 24) numMessages = $(`#${from}LightMaxTooltip`).attr('data-original-title','Maximum light hours must be less than 24').tooltip('show');
+    if(obj.lightThresholdMax < 0) numMessages = $(`#${from}LightMaxTooltip`).attr('data-original-title','Maximum light hours must be greater than 0').tooltip('show');
+    if(obj.lightThresholdMax < obj.lightThresholdMin) numMessages = $(`#${from}LightMaxTooltip`).attr('data-original-title','Maximum Light Hours must be greater than or equal to Minimum Light Hours').tooltip('show');
 
-    if(obj.soilMoistureMax > 850) numMessages += addAlertBullet('Maximum Soil Moisture must be less than 850');
-    if(obj.soilMoistureMax < 375) numMessages += addAlertBullet('Maximum Soil Moisture must be greater than 375');
-    if(obj.soilMoistureMin > 850) numMessages += addAlertBullet('Minimum Soil Moisture must be less than 850');
-    if(obj.soilMoistureMin < 375) numMessages += addAlertBullet('Minimum Soil Moisture must be greater than 375');
-    if(obj.soilMoistureMax < obj.soilMoistureMin) numMessages += addAlertBullet('Maximum Soil Moisture must be greater than or equal to Minimum Soil Moisture');
+    if(obj.soilMoistureMin > 850) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be less than 850').tooltip('show');
+    if(obj.soilMoistureMin < 375) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be greater than 375').tooltip('show');
+    if(obj.soilMoistureMax > 850) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be less than 850').tooltip('show');
+    if(obj.soilMoistureMax < 375) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be greater than 375').tooltip('show');
+    if(obj.soilMoistureMax < obj.soilMoistureMin) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be greater than or equal to Minimum Soil Moisture').tooltip('show');
 
-    if(numMessages > 0){
-      showAlertModal(from);
-      return null;
-    }
+    if(numMessages) return null;
 
     return(obj);
 }
@@ -153,10 +137,10 @@ function loadDefault(event){
      [data] = data; // removed array wrapper
      if(!data) return;
 
-     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMax`).val(data.soilMoisture.max);
-     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}SoilMoistureMin`).val(data.soilMoisture.min);
-     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMax`).val(data.lightThreshold.max);
-     $(`select#${from}PlantType`).parent().siblings('div.form-group.row').children(`input#${from}LightMin`).val(data.lightThreshold.min);
+     $(`input#${from}SoilMoistureMax`).val(data.soilMoisture.max);
+     $(`input#${from}SoilMoistureMin`).val(data.soilMoisture.min);
+     $(`input#${from}LightMax`).val(data.lightThreshold.max);
+     $(`input#${from}LightMin`).val(data.lightThreshold.min);
   });
 }
 
@@ -169,6 +153,9 @@ function modalKeypress(event) {
 
 $(document).ready(function(){
     updateSelects();
+
+    $('[data-toggle="tooltip"]').attr('data-original-title','').attr('title','').tooltip('hide'); // Change all tooltip titles once to overwrite the title attr with the data-original-title attr
+
     $('#newPlantModal').on('keypress', {cb: newPlant}, modalKeypress);
     $('#newPlantSubmit').on('click', newPlant);
 
@@ -182,4 +169,8 @@ $(document).ready(function(){
     $('#newPlantModal').on('show.bs.modal', {from: 'new'}, loadDefault);
     $('#newPlantType').on('change', {from: 'new'}, loadDefault);
     $('#updatePlantType').on('change', {from: 'update'}, loadDefault);
+
+    $('input').on('click', function(event){
+      $('[data-toggle="tooltip"]').tooltip('hide');
+    });
 });
