@@ -205,24 +205,7 @@ function getYLabel(type){
 }
 
 function getTimeFormat(time){
-  switch(time) {
-    case 1:
-      return '%H:%M';
-    case 2:
-      return '%H:%M';
-    case 12:
-      return '%H:%M';
-    case 24:
-      return '%H:%M';
-    case 72:
-      return '%m/%d - %H:%M';
-    case 168:
-      return '%m/%d - %H';
-    case 336:
-      return '%m/%d';
-    default:
-      return 'Error';
-  }
+  return ((time < 72) ? ('%H:%M') : ('%m/%d - %H:%M'));
 }
 
 function formatData(type, Data){
