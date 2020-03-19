@@ -102,19 +102,19 @@ callbacks.auth.google.success = function(req,res){
 // ======================================== INDEX ========================================
 // GET
 callbacks.index.get.landing = function(req,res){
-  if(req.isAuthenticated()) res.redirect('/index');
-  res.render(views.index.landing);
+  if(req.isAuthenticated()) return res.redirect('/index');
+  return res.render(views.index.landing);
 };
 
 callbacks.index.get.index = function(req,res){
   console.log('================ '+req.clientIp+' ================');
-  if(!req.isAuthenticated()) res.redirect('/');
+  if(!req.isAuthenticated()) return res.redirect('/');
   Plant.find({Owner: req.user._id}, (err, foundPlants) => {
     if(err) throw err;
     Default.find({}, (err, foundDefaults) => {
       if(err) throw err;
-      res.render(views.index.index, { numPlants: foundPlants.length,
-                                      defaults: foundDefaults });
+      return res.render(views.index.index, { numPlants: foundPlants.length,
+                                              defaults: foundDefaults });
     });
   });
 };
@@ -135,7 +135,7 @@ callbacks.data.get.log = function(req,res){
         return(!(i%(10 - req.params.time/24) === 0));
       });
     }
-    res.send(logs);
+    return res.send(logs);
   });
 }
 
@@ -149,21 +149,21 @@ callbacks.data.get.plant = function(req,res){
 
   Plant.find(query, (err, foundPlants) => {
     if (err) throw err;
-    res.send(foundPlants);
+    return res.send(foundPlants);
   });
 }
 
 callbacks.data.get.message = function(req,res){
   Message.find({plant: req.query.id}, (err, foundMessages) => {
     if(err) throw err;
-    res.send(foundMessages);
+    return res.send(foundMessages);
   });
 }
 
 callbacks.data.get.default = function(req,res){
   Default.find({type: req.query.type}, (err, foundDefault) => {
     if(err) throw err;
-    res.send(foundDefault);
+    return res.send(foundDefault);
   });
 }
 
@@ -190,7 +190,7 @@ callbacks.data.post.newPlant = function(req, res){
 
   Plant.create(plantObj, (err, newPlant) => {
     if(err) throw err;
-    res.send(newPlant);
+    return res.send(newPlant);
   });
 }
 
@@ -201,10 +201,10 @@ callbacks.data.put.notifications = function(req,res){
     foundUser.notifications = req.body.checked;
     foundUser.save()
                 .then((savedUser) => {
-                  res.end();
+                  return res.end();
                 }).catch((e) => {
                   console.log(e);
-                  res.end();
+                  return res.end();
                 });
   });
 }
@@ -226,10 +226,10 @@ callbacks.data.put.updatePlant = function(req, res){
 
     foundPlant.save()
                 .then((savedPlant) => {
-                  res.end();
+                  return res.end();
                 }).catch((e) => {
                   console.log(e);
-                  res.end();
+                  return res.end();
                 });
   });
 }
@@ -238,14 +238,14 @@ callbacks.data.put.updatePlant = function(req, res){
 callbacks.data.delete.message = function(req,res){
   Message.deleteOne({_id: req.body.id}, (err) => {
     if(err) throw err;
-    res.end();
+    return res.end();
   });
 }
 
 callbacks.data.delete.allMessages = function(req, res){
   Message.deleteMany({plant: req.body.plant}, (err) => {
     if(err) throw err;
-    res.end();
+    return res.end();
   });
 }
 
@@ -256,7 +256,7 @@ callbacks.data.delete.plant = function(req, res){
       if(err) throw err;
       Message.deleteMany({plant: req.body.id}, function(err){
         if(err) throw err;
-        res.end();
+        return res.end();
       });
     });
   });
@@ -270,15 +270,15 @@ callbacks.controller.get.setpoints = function(req,res){
   Plant.findById(req.body.plantid, (err, foundPlant) => {
     if(err || !foundPlant){
       console.log("err: "+err);
-      res.send("err: "+err);
+      return res.send("err: "+err);
     } else {
-      res.send(JSON.stringify(foundPlant));
+      return res.send(JSON.stringify(foundPlant));
     }
   });
 };
 
 callbacks.controller.get.epoch = function(req,res){
-  res.send(JSON.stringify({epoch: Math.floor(new Date().getTime() / 1000)}));
+  return res.send(JSON.stringify({epoch: Math.floor(new Date().getTime() / 1000)}));
 }
 
 // POST
@@ -303,19 +303,16 @@ callbacks.controller.post.message = function(req,res){
 
     Message.create(mesObj, (err, newMessage) => {
       if(err) throw err;
-      res.end();
+      return res.end();
     });
 
   } catch (e) {
-    res.send(e);
+    return res.send(e);
   }
 }
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
-  console.log('=============== Log ===============');
-  console.log(req.body);
-  console.log('===================================');
   try {
     var logObj = {
       plant: req.body.plantid,
@@ -332,11 +329,11 @@ callbacks.controller.put.logs = function(req,res){
 
     Log.create(logObj,(err, newLog) => {
       if(err) throw err;
-      res.end();
+      return res.end();
     });
 
   } catch (e) {
-    res.send(e);
+    return res.send(e);
   }
 };
 
@@ -350,7 +347,7 @@ callbacks.config.get.success = function(req,res){
   }
 
   Config.find(query, function(err, foundConfig){
-    res.send(JSON.stringify(foundConfig));
+    return res.send(JSON.stringify(foundConfig));
   });
 }
 
