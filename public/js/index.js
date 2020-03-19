@@ -100,6 +100,8 @@ function buildSVG(){
                             .attr('stroke-dasharray', '25,5');
 
           try {
+            if(defaultPlant.desired.min < yScale.domain()[0] || defaultPlant.desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
+
             maxThreshold
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
@@ -113,7 +115,7 @@ function buildSVG(){
               );
 
           } catch (e) {
-              if(e.name === 'TypeError'){
+              if(e instanceof TypeError || e.message === 'Setpoints outside of Chart Y Axis boundries'){
                 maxThreshold.attr('d', '');
                 minThreshold.attr('d', '');
               } else {
@@ -316,6 +318,8 @@ function updateChart(){
         success : function(defaultPlant){
           defaultPlant = formatDefaultData(type, time, defaultPlant);
           try {
+            if(defaultPlant.desired.min < yScale.domain()[0] || defaultPlant.desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
+
             maxThreshold
               .datum(defaultPlant)
                 .transition()
@@ -334,7 +338,7 @@ function updateChart(){
                   .y(function(d){ return yScale(d.desired.min); })
                 );
           } catch (e) {
-            if(e.name === 'TypeError'){
+            if(e instanceof TypeError || e.message === 'Setpoints outside of Chart Y Axis boundries'){
               maxThreshold
                 .transition()
                 .duration(1000)
