@@ -66,14 +66,18 @@ function newPlant(){
   var data = dataValidation('new');
   if(!data) return;
   $('#newPlantModal').modal('hide');
-  $.post( "/data/newPlant", data)
-    .done(function( result ){
+  $.ajax({
+    url: "/data/newPlant",
+    type: "POST",
+    data: data,
+    success: function( result ){
       $('div#newPlantModal input').val('');
       $('select#newPlantType').prop('selectedIndex',0);
       updateSelects(result._id).then((numPlants) => {
         if(numPlants === 1) location.reload();
       });
-    });
+    }
+  });
 }
 
 function updatePlant(){

@@ -13,7 +13,8 @@ const User            = require(rootDir+"models/user.js"),
 
 const views           = require(rootDir+"views/views.js");
 
-const genUID          = require(rootDir+"helpers/UID.js");
+const genUID          = require(rootDir+"helpers/UID.js"),
+      dataValidation  = require(rootDir+"helpers/dataValidation.js");
 
 const sendmail        = require(rootDir+"emails/nodemailer.js");
 
@@ -168,7 +169,7 @@ callbacks.data.get.default = function(req,res){
 
 // POST
 callbacks.data.post.newPlant = function(req, res){
-  var PlantObj = {
+  var plantObj = {
       Name: req.body.Name,
       Type: req.body.Type,
       Owner: req.user._id,
@@ -182,7 +183,12 @@ callbacks.data.post.newPlant = function(req, res){
       }
     };
 
-  Plant.create(PlantObj, (err, newPlant) => {
+  if(!dataValidation(plantObj)){
+    res.status(422);
+    return res.end();
+  }
+
+  Plant.create(plantObj, (err, newPlant) => {
     if(err) throw err;
     res.send(newPlant);
   });
@@ -212,6 +218,11 @@ callbacks.data.put.updatePlant = function(req, res){
     foundPlant.soilMoisture.max = req.body.soilMoistureMax;
     foundPlant.lightThreshold.min = req.body.lightThresholdMin;
     foundPlant.lightThreshold.max = req.body.lightThresholdMax;
+
+    if(!dataValidation(foundPlant)){
+      res.status(422);
+      return res.end();
+    }
 
     foundPlant.save()
                 .then((savedPlant) => {
