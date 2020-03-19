@@ -23,10 +23,10 @@ function dataValidation(from){
     if(obj.lightThresholdMax < 0) numMessages = $(`#${from}LightMaxTooltip`).attr('data-original-title','Maximum light hours must be greater than 0').tooltip('show');
     if(obj.lightThresholdMax < obj.lightThresholdMin) numMessages = $(`#${from}LightMaxTooltip`).attr('data-original-title','Maximum Light Hours must be greater than or equal to Minimum Light Hours').tooltip('show');
 
-    if(obj.soilMoistureMin > 850) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be less than 850').tooltip('show');
-    if(obj.soilMoistureMin < 375) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be greater than 375').tooltip('show');
-    if(obj.soilMoistureMax > 850) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be less than 850').tooltip('show');
-    if(obj.soilMoistureMax < 375) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be greater than 375').tooltip('show');
+    if(obj.soilMoistureMin > 100) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be less than 100%').tooltip('show');
+    if(obj.soilMoistureMin < 0) numMessages = $(`#${from}SoilMoistureMinTooltip`).attr('data-original-title','Minimum Soil Moisture must be greater than 0%').tooltip('show');
+    if(obj.soilMoistureMax > 100) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be less than 100%').tooltip('show');
+    if(obj.soilMoistureMax < 0) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be greater than 0%').tooltip('show');
     if(obj.soilMoistureMax < obj.soilMoistureMin) numMessages = $(`#${from}SoilMoistureMaxTooltip`).attr('data-original-title','Maximum Soil Moisture must be greater than or equal to Minimum Soil Moisture').tooltip('show');
 
     if(numMessages) return null;

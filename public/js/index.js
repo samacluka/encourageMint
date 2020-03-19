@@ -36,7 +36,7 @@ function buildSVG(){
     data = formatData(type, Data);
     if(!data) return;
 
-    setScales(time, data);
+    setScales(time, type, data);
 
     d3.select('div.svg')
       .append('svg')
@@ -194,9 +194,9 @@ function getYLabel(type){
     case "temperature":
       return 'Temperature (°C)';
     case "humidity":
-      return 'Humidity (g/kg)';
+      return 'Humidity (g/m³)';
     case "soilMoisture":
-      return 'Soil Moisture (g/kg)';
+      return 'Soil Moisture (%)';
     case "light":
       return 'Light Hours (Hrs)';
     default:
@@ -237,13 +237,21 @@ function formatDefaultData(type, time, [defaultPlant]){
   return arr;
 }
 
-function setScales(time, Data){
+function setScales(time, type, Data){
   var now = new Date().getTime();
   var prev = now - parseInt(time) * 60 * 60 * 1000;
 
+  // Add padding to data range inversely purportional to original range // padding can range from +/- 20 to +/- 100
+  var y;
+  if(type === 'soilMoisture'){ // If type is soilMoisture limit to between 0% and 100%
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? Math.min(100, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+  } else {
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+  }
+
   yScale = d3.scaleLinear()
                // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
-               .domain(d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1))))  // Add padding to data range inversely purportional to original range // padding can range from +/- 20 to +/- 100
+               .domain(y)
                .range([height - padding, padding]);
 
   xScale = d3.scaleTime()
@@ -269,7 +277,7 @@ function updateChart(){
     data = formatData(type, Data);
     if(!data) return;
 
-    setScales(time, data);
+    setScales(time, type, data);
 
     xAxis
       .transition()

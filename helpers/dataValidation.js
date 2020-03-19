@@ -8,10 +8,10 @@ module.exports = function(obj){
     if(obj.lightThresholdMax < 0) return null;
     if(obj.lightThresholdMax < obj.lightThresholdMin) return null;
 
-    if(obj.soilMoistureMin > 850) return null;
-    if(obj.soilMoistureMin < 375) return null;
-    if(obj.soilMoistureMax > 850) return null;
-    if(obj.soilMoistureMax < 375) return null;
+    if(obj.soilMoistureMin > 100) return null;
+    if(obj.soilMoistureMin < 0) return null;
+    if(obj.soilMoistureMax > 100) return null;
+    if(obj.soilMoistureMax < 0) return null;
     if(obj.soilMoistureMax < obj.soilMoistureMin) return null;
 
     return(obj);
