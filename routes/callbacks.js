@@ -313,6 +313,9 @@ callbacks.controller.post.message = function(req,res){
 
 // PUT
 callbacks.controller.put.logs = function(req,res){
+  console.log('=============== Log ===============');
+  console.log(req.body);
+  console.log('===================================');
   try {
     var logObj = {
       plant: req.body.plantid,
