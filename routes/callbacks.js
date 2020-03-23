@@ -389,27 +389,27 @@ callbacks.config.post.new = function(req,res){
         return res.send(mcidJSON);
       }
     } else{ // From webapp
-      if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
-      if(foundConfig){ // Second to hit route
-        console.log("Web app was second to route");
-        foundConfig.success = true;
-        foundConfig.plant = req.body.plant;
-        foundConfig.save();
+      Plant.findById(req.body.plant, (err, foundPlant) => {
+        if(err) throw err;
+        if(foundPlant.mc && foundPlant.mc !== "") return res.end(); // if the plant already has a mcid stop
+        if(foundConfig){ // Second to hit route
+          console.log("Web app was second to route");
+          foundConfig.success = true;
+          foundConfig.plant = req.body.plant;
+          foundConfig.save();
 
-        Plant.findById(req.body.plant, (err, foundPlant) => {
-          if(err) throw err;
           foundPlant.mc = foundConfig.mc;
           foundPlant.save();
-        });
 
-        console.log('Web App finished config');
-        return res.end();
-      } else { // First
-        console.log("Web app was first to route");
-        Config.create({ plant: req.body.plant, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
-        console.log('Web app started config');
-        return res.end();
-      }
+          console.log('Web App finished config');
+          return res.end();
+        } else { // First
+          console.log("Web app was first to route");
+          Config.create({ plant: req.body.plant, ip: reqIp }, (err, newConfig) => { if(err) throw err; });
+          console.log('Web app started config');
+          return res.end();
+        }
+      });
     }
   });
 }
