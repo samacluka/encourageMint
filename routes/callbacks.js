@@ -319,8 +319,7 @@ callbacks.controller.put.logs = function(req,res){
       temperature: req.body.temperature,
       humidity: req.body.humidity,
       soilMoisture: req.body.soilMoisture,
-      light: req.body.light,
-      pumpTime: req.body.pumpTime
+      light: req.body.light
     }
 
     var time = new Date();

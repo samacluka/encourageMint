@@ -9,7 +9,6 @@ var logSchema = new mongoose.Schema({
   humidity: Number,
   soilMoisture: Number,
   light: Number,
-  pumpTime: Number,
 }, { collection: 'Log' });
 
 module.exports = mongoose.model("Log", logSchema);
