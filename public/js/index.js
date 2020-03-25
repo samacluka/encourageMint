@@ -196,7 +196,7 @@ function getYLabel(type){
     case "temperature":
       return 'Temperature (°C)';
     case "humidity":
-      return 'Humidity (g/m³)';
+      return 'Humidity (%)';
     case "soilMoisture":
       return 'Soil Moisture (%)';
     case "light":
