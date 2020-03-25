@@ -166,11 +166,11 @@ function color(type){
     case "temperature":
       return '#bf0000';
     case "humidity":
-      return '#0300bf';
-    case "soilMoisture":
       return '#b80099';
+    case "soilMoisture":
+      return '#0300bf';
     case "light":
-      return '#00960a';
+      return '#FFD700';
     default:
       return 'black';
   }
