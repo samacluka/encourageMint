@@ -247,13 +247,16 @@ function setScales(time, type, Data){
   var y;
   if(type === 'soilMoisture'){ // If type is soilMoisture limit to between 0% and 100%
     // padding can range from +/- 20 to +/- 100 AND limited from 0 to 100 (%)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
   } else if(type === 'light'){
     // padding can range from +/- 5 to +/- 10 AND limited from 0 to 24 (hours)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+  } else if(type === 'temperature'){
+    // padding can range from +/- 20 to +/- 30 AND limited from 0 to 50
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(50, x+20/(a[1]-a[0] > 0.667 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.667 ? a[1] - a[0] : 1)));
   } else {
-    // padding can range from +/- 20 to +/- 100 AND limited from 0 to inf
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i%2 ? x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+    // padding can range from +/- 10 to +/- 50 AND limited from 0 to inf
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? x+10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
   }
 
   yScale = d3.scaleLinear()
