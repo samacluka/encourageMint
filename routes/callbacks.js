@@ -262,6 +262,18 @@ callbacks.data.delete.plant = function(req, res){
   });
 }
 
+callbacks.data.delete.logs = function(req,res){
+  var time = new Date();
+  time.setTime(time.getTime() - req.body.time * 60 * 1000);
+
+  var query = {plant: req.body.plant, created: {$gt: time}}; // Making room for the query to be built up
+
+  Log.deleteMany(query, (err) => {
+    if(err) throw err;
+    return res.end();
+  });
+}
+
 // ======================================== CONTROLLER ========================================
 // GET
 callbacks.controller.get.setpoints = function(req,res){

@@ -481,6 +481,18 @@ $(document).ready(function(){
         async: true,
     });
   });
+  $('button.delete-log').on('click', function(event){
+    $.ajax({ type: "DELETE",
+        url: '/data/deleteLogs',
+        data: { plant: $('select#plant-select').val(), time: $(this).data('time') },
+        async: true,
+        success: function(){
+          registerButton();
+          loadAlerts();
+          updateChart();
+        }
+    });
+  });
 
   $('input#email').on('click', function(){
     $.ajax({

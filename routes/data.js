@@ -22,5 +22,6 @@ router.put("/updatePlant", is.LoggedIn, callbacks.data.put.updatePlant);
 router.delete("/message", is.LoggedIn, callbacks.data.delete.message);
 router.delete("/allMessage", is.LoggedIn, callbacks.data.delete.allMessages);
 router.delete("/deletePlant", is.LoggedIn, callbacks.data.delete.plant);
+router.delete('/deleteLogs', is.LoggedIn, callbacks.data.delete.logs);
 
 module.exports = router;
