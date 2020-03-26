@@ -100,7 +100,7 @@ function buildSVG(){
                             .attr('stroke-dasharray', '25,5');
 
           try {
-            if(defaultPlant.desired.min < yScale.domain()[0] || defaultPlant.desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
+            if(defaultPlant[0].desired.min < yScale.domain()[0] || defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
 
             maxThreshold
               .attr('d', d3.line()
@@ -321,7 +321,7 @@ function updateChart(){
         success : function(defaultPlant){
           defaultPlant = formatDefaultData(type, time, defaultPlant);
           try {
-            if(defaultPlant.desired.min < yScale.domain()[0] || defaultPlant.desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
+            if(defaultPlant[0].desired.min < yScale.domain()[0] || defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
 
             maxThreshold
               .datum(defaultPlant)
