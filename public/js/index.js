@@ -17,6 +17,8 @@ var line;
 var lineWidth = 4;
 var maxThreshold;
 var minThreshold;
+var minText;
+var maxText;
 
 var data;
 
@@ -99,8 +101,20 @@ function buildSVG(){
                             .attr('stroke-width', lineWidth-2)
                             .attr('stroke-dasharray', '25,5');
 
+          minText = svg
+                      .append('text')
+                        .attr('id','minText')
+                        .style('text-anchor','middle')
+                        .text('Min');
+
+          maxText = svg
+                      .append('text')
+                        .attr('id','maxText')
+                        .style('text-anchor','middle')
+                        .text('Max');
+
           try {
-            if(defaultPlant[0].desired.min < yScale.domain()[0] || defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
+            if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
 
             maxThreshold
               .attr('d', d3.line()
@@ -108,19 +122,33 @@ function buildSVG(){
                 .y(function(d){ return yScale(d.desired.max); })
               );
 
+            maxText.text('Max');
+          } catch (e) {
+              if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
+                maxThreshold.attr('d', '');
+                maxText.text('');
+              } else {
+                console.log(e);
+              }
+          }
+
+          try {
+            if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
+
             minThreshold
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
                 .y(function(d){ return yScale(d.desired.min); })
               );
 
+            minText.text('Min');
           } catch (e) {
-              if(e instanceof TypeError || e.message === 'Setpoints outside of Chart Y Axis boundries'){
-                maxThreshold.attr('d', '');
-                minThreshold.attr('d', '');
-              } else {
-                console.log(e);
-              }
+            if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
+              minThreshold.attr('d', '');
+              minText.text('');
+            } else {
+              console.log(e);
+            }
           }
         }
       });
@@ -321,8 +349,7 @@ function updateChart(){
         success : function(defaultPlant){
           defaultPlant = formatDefaultData(type, time, defaultPlant);
           try {
-            if(defaultPlant[0].desired.min < yScale.domain()[0] || defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Setpoints outside of Chart Y Axis boundries');
-
+            if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
             maxThreshold
               .datum(defaultPlant)
                 .transition()
@@ -332,6 +359,27 @@ function updateChart(){
                   .y(function(d){ return yScale(d.desired.max); })
                 );
 
+            maxText
+              .transition()
+              .duration(1000)
+              .attr('x', width - padding/2)
+              .attr('y', yScale(defaultPlant[0].desired.max))
+              .text('Max');
+          } catch (e) {
+            if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
+              maxThreshold
+                .transition()
+                .duration(1000)
+                .attr('d','');
+
+              maxText.text('');
+            } else {
+              console.log(e);
+            }
+          }
+
+          try {
+            if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
             minThreshold
               .datum(defaultPlant)
                 .transition()
@@ -340,17 +388,21 @@ function updateChart(){
                   .x(function(d){ return xScale(d.created); })
                   .y(function(d){ return yScale(d.desired.min); })
                 );
-          } catch (e) {
-            if(e instanceof TypeError || e.message === 'Setpoints outside of Chart Y Axis boundries'){
-              maxThreshold
-                .transition()
-                .duration(1000)
-                .attr('d','');
 
+            minText
+              .transition()
+              .duration(1000)
+              .attr('x', width - padding/2)
+              .attr('y', yScale(defaultPlant[0].desired.min))
+              .text('Min');
+          } catch (e) {
+            if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
               minThreshold
                 .transition()
                 .duration(1000)
                 .attr('d','');
+
+              minText.text('');
             } else {
               console.log(e);
             }
