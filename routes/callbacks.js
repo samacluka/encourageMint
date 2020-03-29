@@ -127,14 +127,8 @@ callbacks.data.get.log = function(req,res){
 
   // Find anything younger than one week
   var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
-  
   Log.find(query).sort('created').exec((err, logs) => {
     if (err) throw err;
-    if(logs.length > 500){
-      logs = logs.filter((l, i, a) => {
-        return(!(i%(10 - req.params.time/24) === 0));
-      });
-    }
     return res.send(logs);
   });
 }
