@@ -127,7 +127,7 @@ callbacks.data.get.log = function(req,res){
 
   // Find anything younger than one week
   var query = {plant: req.params.id, created: {$gt: time}}; // Making room for the query to be built up
-
+  
   Log.find(query).sort('created').exec((err, logs) => {
     if (err) throw err;
     if(logs.length > 500){
@@ -252,14 +252,17 @@ callbacks.data.delete.allMessages = function(req, res){
 callbacks.data.delete.plant = function(req, res){
   Plant.deleteOne({_id: req.body.id}, function(err){
     if(err) throw err;
-    Log.deleteMany({plant: req.body.id}, function(err){
-      if(err) throw err;
-      Message.deleteMany({plant: req.body.id}, function(err){
-        if(err) throw err;
-        return res.end();
-      });
-    });
   });
+  Log.deleteMany({plant: req.body.id}, function(err){
+    if(err) throw err;
+  });
+  Message.deleteMany({plant: req.body.id}, function(err){
+    if(err) throw err;
+  });
+  Config.deleteOne({plant: req.body.id}, function(err){
+    if(err) throw err;
+  })
+  return res.end();
 }
 
 callbacks.data.delete.logs = function(req,res){
