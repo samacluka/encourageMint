@@ -436,10 +436,11 @@ function selectPill(event){
 }
 
 function loadAlerts(){
-  if(!$('select#plant-select').val()) return;
+  plantid = $('select#plant-select').val();
+  if(!plantid) return;
   $.ajax({ type: "GET",
       url: '/data/message',
-      data: { id: $('select#plant-select').val() },
+      data: { id: plantid },
       async: true,
       success : function(messages){
         $('div.alert').each(function(i){
@@ -479,21 +480,32 @@ function loadAlerts(){
     });
 }
 
-function registerButton(){
-  if(!$('select#plant-select').val()) return;
+function registerButton(plantid = $('select#plant-select').val()){
+  if(!plantid) throw new Error('No plant ID in main select');
   $.ajax({ type: "GET",
-      url: '/data/plant',
-      data: {id: $('select#plant-select').val(), type: 'pid'},
+      url: '/config/success',
+      data: {plant: plantid},
       async: true,
-      success : function(plant){
-        [plant] = plant; // remove array wrapper
-        if(!plant.mc){
+      success: function(config){
+        [config] = JSON.parse(config); // Convert string to JSON Remove array wrapper
+        if(config){
+          let now = new Date();
+          let created = new Date(config.created);
+          let elapsed = now.getTime() - created.getTime();
+
+          if((elapsed < 5 * 60 * 1000) && !config.success || config.success){ // Config has started or completed successful
+            $('button#registerPlant').hide({duration: 400});
+          } else if((elapsed >= 5 * 60 * 1000) && !config.success){ // Config failed
+            $(`select#plant-select option[value="${ plantid }"]`).prop('selected',true);
+            $('button#registerPlant').html('<small>Association Failed. Please Try Connecting Again</small>');
+            $('button#registerPlant').show({duration: 800});
+          }
+        } else {                                                // No config
+          $('button#registerPlant').html('Connect Plant');
           $('button#registerPlant').show({duration: 800});
-        } else {
-          $('button#registerPlant').hide({duration: 400});
         }
       }
-    });
+  })
 }
 
 $(document).ready(function(){
@@ -514,15 +526,7 @@ $(document).ready(function(){
     $(this).hide({duration: 400});
     $(this).html('Connect Plant');
     setTimeout(function(){
-      $.get("/config/success", { plant: plantid })
-        .done(function( data ){
-          [data] = JSON.parse(data); // Convert string to JSON Remove array wrapper
-          if(!data.success){
-            $(`select#plant-select option[value="${ plantid }"]`).prop('selected',true);
-            $('button#registerPlant').html('<small>Association Failed. Please Try Connecting Again</small>');
-            $('button#registerPlant').show({duration:400});
-          }
-        });
+      registerButton(plantid);
     }, 5.5 * 60 * 1000); // 5.5 minutes after button click
   });
   $('#deleteAllMessages').on('click', function(event){
