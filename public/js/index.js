@@ -79,7 +79,8 @@ function buildSVG(){
                 .y(function(d){ return yScale(d.desired); })
               );
 
-    $.ajax({ type: "GET",
+    if(type === 'soilMoisture' || type === 'light'){
+      $.ajax({ type: "GET",
         url: '/data/default',
         data: { type: $('select#updatePlantType').val() },
         async: true,
@@ -152,6 +153,7 @@ function buildSVG(){
           }
         }
       });
+    }
 
     // Set title
     title = svg
@@ -342,7 +344,8 @@ function updateChart(){
           .y(function(d){ return yScale(d.desired); })
         );
 
-    $.ajax({ type: "GET",
+    if(type === 'soilMoisture' || type === 'light'){
+      $.ajax({ type: "GET",
         url: '/data/default',
         data: { type: $('select#updatePlantType').val() },
         async: true,
@@ -409,7 +412,7 @@ function updateChart(){
           }
         }
       });
-
+    }
     // Update Title
     title
       .text(getTitle(type));
