@@ -146,6 +146,7 @@ function getData(period = 168){
 
   d3.json(`/data/log/${plantid}/${period}`, function(Data){
     data = formatData(type, Data);
+    updateGraph()
   });
 }
 
@@ -580,7 +581,6 @@ $(document).ready(function(){
 
   setInterval(function(){
     getData();
-    updateGraph();
     loadAlerts();
   }, 30 * 1000);
 });
