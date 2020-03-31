@@ -140,6 +140,15 @@ function getSelection(){
   return [time, plantid, type];
 }
 
+function getData(period = 168){
+  var [time, plantid, type] = getSelection();
+  if(!plantid) return;
+
+  d3.json(`/data/log/${plantid}/${period}`, function(Data){
+    data = formatData(type, Data);
+  });
+}
+
 function updateGraph(){
   if(!isInitialized){
     initGraph();
@@ -149,9 +158,9 @@ function updateGraph(){
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
-    data = formatData(type, Data);
+  // d3.json(`/data/log/${plantid}/${time}`, function(Data){
     if(!data) return;
+    data = formatData(type, data);
 
     setScales(time, type, data);
 
@@ -171,7 +180,7 @@ function updateGraph(){
                   .tickSizeOuter(0));
 
     line
-      .datum(data)
+      .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
         .transition()
         .duration(1000)
         .attr('stroke', color(type))
@@ -260,7 +269,7 @@ function updateGraph(){
       // Update Y
     yAxisLabel
       .text(getYLabel(type));
-  });
+  // });
 }
 
 function initGraph(){
@@ -273,7 +282,7 @@ function initGraph(){
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${ isInitialized ? time : 1 }`, function(Data){
     data = formatData(type, Data);
     if(!data) return;
 
@@ -309,7 +318,7 @@ function initGraph(){
 
     line = svg
             .append('path')
-            .datum(data)
+            .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
               .attr('fill', 'none')
               .attr('stroke', color(type))
               .attr('stroke-width', lineWidth)
@@ -318,8 +327,7 @@ function initGraph(){
                 .y(function(d){ return yScale(d.desired); })
               );
 
-    if(type === 'soilMoisture' || type === 'light'){
-      $.ajax({ type: "GET",
+    $.ajax({ type: "GET",
         url: '/data/default',
         data: { type: $('select#updatePlantType').val() },
         async: true,
@@ -392,7 +400,6 @@ function initGraph(){
           }
         }
       });
-    }
 
     // Set title
     title = svg
@@ -570,7 +577,11 @@ $(document).ready(function(){
   setTimeout(registerButton, 200);
   setTimeout(loadAlerts, 200);
   setTimeout(initGraph, 200);
+  setTimeout(getData, 50);
 
-  setInterval(updateGraph, 30 * 1000);
+  setInterval(function(){
+    getData();
+    updateGraph();
+  }, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);
 });
