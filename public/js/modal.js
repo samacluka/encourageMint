@@ -95,15 +95,18 @@ function updatePlant(){
 }
 
 function deletePlant(){
-  $.ajax({
-    url: '/data/deletePlant',
-    type: 'DELETE',
-    data: { id: $('select#update-plant-select option:selected').val() },
-    success: function(){
-      updateSelects().then((numPlants) => {
-        if(numPlants === 0) location.reload();
-      });
-    }
+  $('#deleteModal').modal('show');
+  $('#deleteYes').on('click', function(){
+    $.ajax({
+      url: '/data/deletePlant',
+      type: 'DELETE',
+      data: { id: $('select#update-plant-select option:selected').val() },
+      success: function(){
+        updateSelects().then((numPlants) => {
+          if(numPlants === 0) location.reload();
+        });
+      }
+    });
   });
 }
 

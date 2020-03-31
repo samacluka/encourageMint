@@ -543,23 +543,26 @@ $(document).ready(function(){
     }, 5.5 * 60 * 1000); // 5.5 minutes after button click
   });
   $('#deleteAllMessages').on('click', function(event){
-    $('div.alert').alert('close');
-    $.ajax({ type: "DELETE",
+    $('#deleteModal').modal('show');
+    $('#deleteYes').on('click', function(){
+      $('div.alert').alert('close');
+      $.ajax({ type: "DELETE",
         url: '/data/allMessage',
         data: { plant: $('select#plant-select').val() },
         async: true,
+      });
     });
   });
   $('button.delete-log').on('click', function(event){
-    $.ajax({ type: "DELETE",
-        url: '/data/deleteLogs',
-        data: { plant: $('select#plant-select').val(), time: $(this).data('time') },
-        async: true,
-        success: function(){
-          registerButton();
-          loadAlerts();
-          updateGraph();
-        }
+    var timePressed = $(this).data('time');
+    $('#deleteModal').modal('show');
+    $('#deleteYes').on('click', {timePressed: timePressed}, function(event){
+      $.ajax({ type: "DELETE",
+                url: '/data/deleteLogs',
+                data: { plant: $('select#plant-select').val(), time: event.data.timePressed },
+                async: true,
+                success: updateGraph
+      });
     });
   });
 
