@@ -24,7 +24,246 @@ var data;
 
 var isInitialized = false;
 
-function buildSVG(){
+function color(type){
+  switch(type) {
+    case "temperature":
+      return '#bf0000';
+    case "humidity":
+      return '#b80099';
+    case "soilMoisture":
+      return '#0300bf';
+    case "light":
+      return '#FFD700';
+    default:
+      return 'black';
+  }
+}
+
+function getTitle(type){
+  switch(type) {
+    case "temperature":
+      return 'Temperature vs. Time';
+    case "humidity":
+      return 'Humidity vs. Time';
+    case "soilMoisture":
+      return 'Soil Moisture vs. Time';
+    case "light":
+      return 'Light vs. Time';
+    default:
+      return 'Data';
+  }
+}
+
+function getYLabel(type){
+  switch(type) {
+    case "temperature":
+      return 'Temperature (°C)';
+    case "humidity":
+      return 'Humidity (%)';
+    case "soilMoisture":
+      return 'Soil Moisture (%)';
+    case "light":
+      return 'Light Hours (Hrs)';
+    default:
+      return 'Error';
+  }
+}
+
+function getTimeFormat(time){
+  return ((time < 72) ? ('%H:%M') : ('%m/%d - %H:%M'));
+}
+
+function formatData(type, Data){
+  if(!Data) return Data;
+  Data.forEach(function(d,i){
+    d.created = new Date(d.created).getTime();
+    d.desired = type === 'temperature' ? d.temperature :
+                type === 'humidity' ? d.humidity :
+                type === 'soilMoisture' ? d.soilMoisture :
+                type === 'light' ? d.light : -1;
+  });
+  return Data;
+}
+
+function formatDefaultData(type, time, [defaultPlant]){
+  // remove array wrapper in function def
+  var now = new Date().getTime();
+  var prev = now - parseInt(time) * 60 * 60 * 1000;
+
+  var arr = [];
+  var domain = [prev, now];
+  domain.forEach(function(d,i){
+    arr.push({
+      created: d,
+      desired: type === 'soilMoisture' ? defaultPlant.soilMoisture :
+               type === 'light' ? defaultPlant.lightThreshold : null
+    });
+  });
+  return arr;
+}
+
+function setScales(time, type, Data){
+  var now = new Date().getTime();
+  var prev = now - parseInt(time) * 60 * 60 * 1000;
+
+  // Add padding to data range inversely purportional to original range
+  var y;
+  if(type === 'soilMoisture'){ // If type is soilMoisture limit to between 0% and 100%
+    // padding can range from +/- 20 to +/- 100 AND limited from 0 to 100 (%)
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+  } else if(type === 'light'){
+    // padding can range from +/- 5 to +/- 10 AND limited from 0 to 24 (hours)
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+  } else if(type === 'temperature'){
+    // padding can range from +/- 10 to +/- 20 AND limited from 0 to 50
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(50, x+10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+  } else {
+    // padding can range from +/- 10 to +/- 50 AND limited from 0 to inf
+    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? x+10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+  }
+
+  yScale = d3.scaleLinear()
+               // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
+               .domain(y)
+               .range([height - padding, padding]);
+
+  xScale = d3.scaleTime()
+              // .domain(d3.extent(data, d => d.created)) // Stretch available data across whole domain
+              .domain([prev, now])                        // Use time scale for width
+              .range([padding, width - padding]);
+}
+
+function getSelection(){
+  var time = $('div.time-pills a.selected').data('time');
+  var plantid = $("select#plant-select option:selected").val();
+  var type = $('div.type-pills a.selected').data('type');
+  return [time, plantid, type];
+}
+
+function updateGraph(){
+  if(!isInitialized){
+    initGraph();
+    return;
+  }
+
+  var [time, plantid, type] = getSelection();
+  if(!plantid) return;
+
+  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+    data = formatData(type, Data);
+    if(!data) return;
+
+    setScales(time, type, data);
+
+    xAxis
+      .transition()
+      .duration(1000)
+      .call(d3.axisBottom(xScale)
+                  .tickSize(-height + 2*padding)
+                  .tickSizeOuter(0)
+                  .tickFormat(d3.timeFormat(getTimeFormat(time))));
+
+    yAxis
+      .transition()
+      .duration(1000)
+      .call(d3.axisLeft(yScale)
+                  .tickSize(-width + 2*padding)
+                  .tickSizeOuter(0));
+
+    line
+      .datum(data)
+        .transition()
+        .duration(1000)
+        .attr('stroke', color(type))
+        .attr('d', d3.line()
+          .x(function(d){ return xScale(d.created); })
+          .y(function(d){ return yScale(d.desired); })
+        );
+
+    if(type === 'soilMoisture' || type === 'light'){
+      $.ajax({ type: "GET",
+        url: '/data/default',
+        data: { type: $('select#updatePlantType').val() },
+        async: true,
+        success : function(defaultPlant){
+          defaultPlant = formatDefaultData(type, time, defaultPlant);
+          try {
+            if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
+            maxThreshold
+              .datum(defaultPlant)
+                .transition()
+                .duration(1000)
+                .attr('d', d3.line()
+                  .x(function(d){ return xScale(d.created); })
+                  .y(function(d){ return yScale(d.desired.max); })
+                );
+
+            maxText
+              .transition()
+              .duration(1000)
+              .attr('x', width - padding/2)
+              .attr('y', yScale(defaultPlant[0].desired.max))
+              .text('Max');
+          } catch (e) {
+            if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
+              maxThreshold
+                .transition()
+                .duration(1000)
+                .attr('d','');
+
+              maxText.text('');
+            } else {
+              console.log(e);
+            }
+          }
+
+          try {
+            if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
+            minThreshold
+              .datum(defaultPlant)
+                .transition()
+                .duration(1000)
+                .attr('d', d3.line()
+                  .x(function(d){ return xScale(d.created); })
+                  .y(function(d){ return yScale(d.desired.min); })
+                );
+
+            minText
+              .transition()
+              .duration(1000)
+              .attr('x', width - padding/2)
+              .attr('y', yScale(defaultPlant[0].desired.min))
+              .text('Min');
+          } catch (e) {
+            if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
+              minThreshold
+                .transition()
+                .duration(1000)
+                .attr('d','');
+
+              minText.text('');
+            } else {
+              console.log(e);
+            }
+          }
+        }
+      });
+    }
+    // Update Title
+    title
+      .text(getTitle(type));
+
+      // Update X
+    xAxisLabel
+      .text('Time');
+
+      // Update Y
+    yAxisLabel
+      .text(getYLabel(type));
+  });
+}
+
+function initGraph(){
   height = $(window).height()*0.75;
   width = $(window).width()*0.8;
   padding = (50 / 650) * width;
@@ -191,242 +430,6 @@ function buildSVG(){
   });
 }
 
-function color(type){
-  switch(type) {
-    case "temperature":
-      return '#bf0000';
-    case "humidity":
-      return '#b80099';
-    case "soilMoisture":
-      return '#0300bf';
-    case "light":
-      return '#FFD700';
-    default:
-      return 'black';
-  }
-}
-
-function getTitle(type){
-  switch(type) {
-    case "temperature":
-      return 'Temperature vs. Time';
-    case "humidity":
-      return 'Humidity vs. Time';
-    case "soilMoisture":
-      return 'Soil Moisture vs. Time';
-    case "light":
-      return 'Light vs. Time';
-    default:
-      return 'Data';
-  }
-}
-
-function getYLabel(type){
-  switch(type) {
-    case "temperature":
-      return 'Temperature (°C)';
-    case "humidity":
-      return 'Humidity (%)';
-    case "soilMoisture":
-      return 'Soil Moisture (%)';
-    case "light":
-      return 'Light Hours (Hrs)';
-    default:
-      return 'Error';
-  }
-}
-
-function getTimeFormat(time){
-  return ((time < 72) ? ('%H:%M') : ('%m/%d - %H:%M'));
-}
-
-function formatData(type, Data){
-  if(!Data) return Data;
-  Data.forEach(function(d,i){
-    d.created = new Date(d.created).getTime();
-    d.desired = type === 'temperature' ? d.temperature :
-                type === 'humidity' ? d.humidity :
-                type === 'soilMoisture' ? d.soilMoisture :
-                type === 'light' ? d.light : -1;
-  });
-  return Data;
-}
-
-function formatDefaultData(type, time, [defaultPlant]){
-  // remove array wrapper in function def
-  var now = new Date().getTime();
-  var prev = now - parseInt(time) * 60 * 60 * 1000;
-
-  var arr = [];
-  var domain = [prev, now];
-  domain.forEach(function(d,i){
-    arr.push({
-      created: d,
-      desired: type === 'soilMoisture' ? defaultPlant.soilMoisture :
-               type === 'light' ? defaultPlant.lightThreshold : null
-    });
-  });
-  return arr;
-}
-
-function setScales(time, type, Data){
-  var now = new Date().getTime();
-  var prev = now - parseInt(time) * 60 * 60 * 1000;
-
-  // Add padding to data range inversely purportional to original range
-  var y;
-  if(type === 'soilMoisture'){ // If type is soilMoisture limit to between 0% and 100%
-    // padding can range from +/- 20 to +/- 100 AND limited from 0 to 100 (%)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
-  } else if(type === 'light'){
-    // padding can range from +/- 5 to +/- 10 AND limited from 0 to 24 (hours)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
-  } else if(type === 'temperature'){
-    // padding can range from +/- 10 to +/- 20 AND limited from 0 to 50
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(50, x+10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
-  } else {
-    // padding can range from +/- 10 to +/- 50 AND limited from 0 to inf
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? x+10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
-  }
-
-  yScale = d3.scaleLinear()
-               // .domain(d3.extent(Data, d => d.desired)) // Stretch available data across whole range
-               .domain(y)
-               .range([height - padding, padding]);
-
-  xScale = d3.scaleTime()
-              // .domain(d3.extent(data, d => d.created)) // Stretch available data across whole domain
-              .domain([prev, now])                        // Use time scale for width
-              .range([padding, width - padding]);
-}
-
-function getSelection(){
-  var time = $('div.time-pills a.selected').data('time');
-  var plantid = $("select#plant-select option:selected").val();
-  var type = $('div.type-pills a.selected').data('type');
-  return [time, plantid, type];
-}
-
-function updateChart(){
-  if(!isInitialized) buildSVG();
-
-  var [time, plantid, type] = getSelection();
-  if(!plantid) return;
-
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
-    data = formatData(type, Data);
-    if(!data) return;
-
-    setScales(time, type, data);
-
-    xAxis
-      .transition()
-      .duration(1000)
-      .call(d3.axisBottom(xScale)
-                  .tickSize(-height + 2*padding)
-                  .tickSizeOuter(0)
-                  .tickFormat(d3.timeFormat(getTimeFormat(time))));
-
-    yAxis
-      .transition()
-      .duration(1000)
-      .call(d3.axisLeft(yScale)
-                  .tickSize(-width + 2*padding)
-                  .tickSizeOuter(0));
-
-    line
-      .datum(data)
-        .transition()
-        .duration(1000)
-        .attr('stroke', color(type))
-        .attr('d', d3.line()
-          .x(function(d){ return xScale(d.created); })
-          .y(function(d){ return yScale(d.desired); })
-        );
-
-    if(type === 'soilMoisture' || type === 'light'){
-      $.ajax({ type: "GET",
-        url: '/data/default',
-        data: { type: $('select#updatePlantType').val() },
-        async: true,
-        success : function(defaultPlant){
-          defaultPlant = formatDefaultData(type, time, defaultPlant);
-          try {
-            if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
-            maxThreshold
-              .datum(defaultPlant)
-                .transition()
-                .duration(1000)
-                .attr('d', d3.line()
-                  .x(function(d){ return xScale(d.created); })
-                  .y(function(d){ return yScale(d.desired.max); })
-                );
-
-            maxText
-              .transition()
-              .duration(1000)
-              .attr('x', width - padding/2)
-              .attr('y', yScale(defaultPlant[0].desired.max))
-              .text('Max');
-          } catch (e) {
-            if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
-              maxThreshold
-                .transition()
-                .duration(1000)
-                .attr('d','');
-
-              maxText.text('');
-            } else {
-              console.log(e);
-            }
-          }
-
-          try {
-            if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
-            minThreshold
-              .datum(defaultPlant)
-                .transition()
-                .duration(1000)
-                .attr('d', d3.line()
-                  .x(function(d){ return xScale(d.created); })
-                  .y(function(d){ return yScale(d.desired.min); })
-                );
-
-            minText
-              .transition()
-              .duration(1000)
-              .attr('x', width - padding/2)
-              .attr('y', yScale(defaultPlant[0].desired.min))
-              .text('Min');
-          } catch (e) {
-            if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
-              minThreshold
-                .transition()
-                .duration(1000)
-                .attr('d','');
-
-              minText.text('');
-            } else {
-              console.log(e);
-            }
-          }
-        }
-      });
-    }
-    // Update Title
-    title
-      .text(getTitle(type));
-
-      // Update X
-    xAxisLabel
-      .text('Time');
-
-      // Update Y
-    yAxisLabel
-      .text(getYLabel(type));
-  });
-}
-
 function selectPill(event){
   event.preventDefault(); // Prevent scrolling up on data change
   $(`div.${event.data.str}-pills a.selected`).addClass('badge-light');
@@ -435,7 +438,7 @@ function selectPill(event){
   $(this).removeClass('badge-light');
   $(this).addClass('badge-dark');
   $(this).addClass('selected');
-  updateChart();
+  updateGraph();
 }
 
 function loadAlerts(){
@@ -520,7 +523,7 @@ $(document).ready(function(){
     event.stopPropagation();
     registerButton();
     loadAlerts();
-    updateChart();
+    updateGraph();
   });
 
   $('button#registerPlant').on('click', function(event){
@@ -548,7 +551,7 @@ $(document).ready(function(){
         success: function(){
           registerButton();
           loadAlerts();
-          updateChart();
+          updateGraph();
         }
     });
   });
@@ -561,13 +564,13 @@ $(document).ready(function(){
     });
   });
 
-  var debBuildSVG = _.debounce(buildSVG, 300);
-  $(window).on('resize', debBuildSVG);
+  var debInitGraph = _.debounce(initGraph, 300);
+  $(window).on('resize', debInitGraph);
 
   setTimeout(registerButton, 200);
   setTimeout(loadAlerts, 200);
-  setTimeout(buildSVG, 200);
+  setTimeout(initGraph, 200);
 
-  setInterval(updateChart, 30 * 1000);
+  setInterval(updateGraph, 30 * 1000);
   setInterval(loadAlerts, 30 * 1000);
 });
