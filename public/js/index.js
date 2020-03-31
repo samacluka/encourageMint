@@ -110,16 +110,16 @@ function setScales(time, type, Data){
   var y;
   if(type === 'soilMoisture'){ // If type is soilMoisture limit to between 0% and 100%
     // padding can range from +/- 20 to +/- 100 AND limited from 0 to 100 (%)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000), d => d.desired).map((x, i, a) => i ? Math.min(1000, x+20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)) : Math.max(0, x-20/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
   } else if(type === 'light'){
     // padding can range from +/- 5 to +/- 10 AND limited from 0 to 24 (hours)
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000), d => d.desired).map((x, i, a) => i ? Math.min(24, x+5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-5/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
   } else if(type === 'temperature'){
     // padding can range from +/- 10 to +/- 20 AND limited from 0 to 50
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? Math.min(50, x+10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000), d => d.desired).map((x, i, a) => i ? Math.min(50, x+10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)) : Math.max(0, x-10/(a[1]-a[0] > 0.5 ? a[1] - a[0] : 1)));
   } else {
     // padding can range from +/- 10 to +/- 50 AND limited from 0 to inf
-    y = d3.extent(Data, d => d.desired).map((x, i, a) => i ? x+10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
+    y = d3.extent(Data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000), d => d.desired).map((x, i, a) => i ? x+10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1) : Math.max(0, x-10/(a[1]-a[0] > 0.2 ? a[1] - a[0] : 1)));
   }
 
   yScale = d3.scaleLinear()
@@ -140,6 +140,16 @@ function getSelection(){
   return [time, plantid, type];
 }
 
+function getData(period = 168){
+  var [time, plantid, type] = getSelection();
+  if(!plantid) return;
+
+  d3.json(`/data/log/${plantid}/${period}`, function(Data){
+    data = formatData(type, Data);
+    updateGraph()
+  });
+}
+
 function updateGraph(){
   if(!isInitialized){
     initGraph();
@@ -149,9 +159,9 @@ function updateGraph(){
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
-    data = formatData(type, Data);
+  // d3.json(`/data/log/${plantid}/${time}`, function(Data){
     if(!data) return;
+    data = formatData(type, data);
 
     setScales(time, type, data);
 
@@ -171,7 +181,7 @@ function updateGraph(){
                   .tickSizeOuter(0));
 
     line
-      .datum(data)
+      .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
         .transition()
         .duration(1000)
         .attr('stroke', color(type))
@@ -180,8 +190,7 @@ function updateGraph(){
           .y(function(d){ return yScale(d.desired); })
         );
 
-    if(type === 'soilMoisture' || type === 'light'){
-      $.ajax({ type: "GET",
+    $.ajax({ type: "GET",
         url: '/data/default',
         data: { type: $('select#updatePlantType').val() },
         async: true,
@@ -248,7 +257,7 @@ function updateGraph(){
           }
         }
       });
-    }
+
     // Update Title
     title
       .text(getTitle(type));
@@ -260,7 +269,7 @@ function updateGraph(){
       // Update Y
     yAxisLabel
       .text(getYLabel(type));
-  });
+  // });
 }
 
 function initGraph(){
@@ -273,7 +282,7 @@ function initGraph(){
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
-  d3.json(`/data/log/${plantid}/${time}`, function(Data){
+  d3.json(`/data/log/${plantid}/${ isInitialized ? time : 1 }`, function(Data){
     data = formatData(type, Data);
     if(!data) return;
 
@@ -309,7 +318,7 @@ function initGraph(){
 
     line = svg
             .append('path')
-            .datum(data)
+            .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
               .attr('fill', 'none')
               .attr('stroke', color(type))
               .attr('stroke-width', lineWidth)
@@ -568,7 +577,10 @@ $(document).ready(function(){
   setTimeout(registerButton, 200);
   setTimeout(loadAlerts, 200);
   setTimeout(initGraph, 200);
+  setTimeout(getData, 50);
 
-  setInterval(updateGraph, 30 * 1000);
-  setInterval(loadAlerts, 30 * 1000);
+  setInterval(function(){
+    getData();
+    loadAlerts();
+  }, 30 * 1000);
 });
