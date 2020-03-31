@@ -318,8 +318,7 @@ function initGraph(){
                 .y(function(d){ return yScale(d.desired); })
               );
 
-    if(type === 'soilMoisture' || type === 'light'){
-      $.ajax({ type: "GET",
+    $.ajax({ type: "GET",
         url: '/data/default',
         data: { type: $('select#updatePlantType').val() },
         async: true,
@@ -392,7 +391,6 @@ function initGraph(){
           }
         }
       });
-    }
 
     // Set title
     title = svg
