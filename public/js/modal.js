@@ -170,6 +170,8 @@ $(document).ready(function(){
     $('#updatePlantSubmit').on('click', updatePlant);
     $('#deletePlant').on('click', deletePlant);
 
+    $('#deleteModal').on('kepress', {cb: ()=>{}}, modalKeypress);
+
     $('#updatePlantModal').on('show.bs.modal', {from: 'show'}, updatePlantForm);
     $('#update-plant-select').on('change', {from: 'update'}, updatePlantForm);
 
