@@ -544,7 +544,7 @@ $(document).ready(function(){
   });
   $('#deleteAllMessages').on('click', function(event){
     $('#deleteModal').modal('show');
-    $('#deleteYes').on('click', function(){
+    $('#deleteYes').off().on('click', function(){
       $('div.alert').alert('close');
       $.ajax({ type: "DELETE",
         url: '/data/allMessage',
@@ -556,7 +556,7 @@ $(document).ready(function(){
   $('button.delete-log').on('click', function(event){
     var timePressed = $(this).data('time');
     $('#deleteModal').modal('show');
-    $('#deleteYes').on('click', {timePressed: timePressed}, function(event){
+    $('#deleteYes').off().on('click', {timePressed: timePressed}, function(event){
       $.ajax({ type: "DELETE",
                 url: '/data/deleteLogs',
                 data: { plant: $('select#plant-select').val(), time: event.data.timePressed },

@@ -96,7 +96,7 @@ function updatePlant(){
 
 function deletePlant(){
   $('#deleteModal').modal('show');
-  $('#deleteYes').on('click', function(){
+  $('#deleteYes').off().on('click', function(){
     $.ajax({
       url: '/data/deletePlant',
       type: 'DELETE',
