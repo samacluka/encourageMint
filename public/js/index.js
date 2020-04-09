@@ -457,9 +457,7 @@ function loadAlerts(){
       data: { id: plantid },
       async: true,
       success : function(messages){
-        $('div.alert').each(function(i){
-          $(this).remove();
-        });
+        $('div.alert').remove(); // remove all messsages
 
         var str = "";
         messages.forEach((message, index) => {
@@ -478,7 +476,7 @@ function loadAlerts(){
               </button>
             </div>
           </div>
-          `
+          `;
         });
 
         $('div.messages > div.container').append(str);
