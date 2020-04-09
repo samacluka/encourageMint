@@ -495,7 +495,11 @@ function loadAlerts(){
 }
 
 function registerButton(plantid = $('select#plant-select').val()){
-  if(!plantid) throw new Error('No plant ID in main select');
+  if(!plantid){
+    throw new Error('No plant ID in main select');
+    return
+  }
+  
   $.ajax({ type: "GET",
       url: '/config/success',
       data: {plant: plantid},
