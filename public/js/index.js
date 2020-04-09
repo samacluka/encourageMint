@@ -15,8 +15,8 @@ var title;
 var svg;
 var line;
 var lineWidth = 4;
-var maxThreshold;
-var minThreshold;
+var maxLine;
+var minLine;
 var minText;
 var maxText;
 
@@ -198,7 +198,7 @@ function updateGraph(){
           defaultPlant = formatDefaultData(type, time, defaultPlant);
           try {
             if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
-            maxThreshold
+            maxLine
               .datum(defaultPlant)
                 .transition()
                 .duration(1000)
@@ -215,7 +215,7 @@ function updateGraph(){
               .text('Max');
           } catch (e) {
             if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
-              maxThreshold
+              maxLine
                 .transition()
                 .duration(1000)
                 .attr('d','');
@@ -228,7 +228,7 @@ function updateGraph(){
 
           try {
             if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
-            minThreshold
+            minLine
               .datum(defaultPlant)
                 .transition()
                 .duration(1000)
@@ -245,7 +245,7 @@ function updateGraph(){
               .text('Min');
           } catch (e) {
             if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
-              minThreshold
+              minLine
                 .transition()
                 .duration(1000)
                 .attr('d','');
@@ -270,6 +270,20 @@ function updateGraph(){
     yAxisLabel
       .text(getYLabel(type));
   // });
+
+  // If there are multiple graphs: delete and reinitialize
+  if($('svg > g.xAxis').length > 1 ||
+     $('svg > g.yAxis').length > 1 ||
+     $('svg > text#title').length > 1 ||
+     $('svg > text#xAxisLabel').length > 1 ||
+     $('svg > text#yAxisLabel').length > 1 ||
+     $('svg > text#minText').length > 1 ||
+     $('svg > text#maxText').length > 1 ||
+     $('svg > path#graphLine').length > 1 ||
+     $('svg > path#minLine').length > 1 ||
+     $('svg > path#maxLine').length > 1){
+       initGraph();
+     }
 }
 
 function initGraph(){
@@ -320,6 +334,7 @@ function initGraph(){
     line = svg
             .append('path')
             .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
+              .attr('id','graphLine')
               .attr('fill', 'none')
               .attr('stroke', getColour(type))
               .attr('stroke-width', lineWidth)
@@ -334,17 +349,19 @@ function initGraph(){
         async: true,
         success : function(defaultPlant){
           defaultPlant = formatDefaultData(type, time, defaultPlant);
-          maxThreshold = svg
+          maxLine = svg
                           .append('path')
                           .datum(defaultPlant)
+                            .attr('id','maxLine')
                             .attr('fill', 'none')
                             .attr('stroke', '#4e5f70e8')
                             .attr('stroke-width', lineWidth-2)
                             .attr('stroke-dasharray', '25,5');
 
-          minThreshold = svg
+          minLine = svg
                           .append('path')
                           .datum(defaultPlant)
+                            .attr('id','minLine')
                             .attr('fill', 'none')
                             .attr('stroke', '#4e5f70e8')
                             .attr('stroke-width', lineWidth-2)
@@ -365,7 +382,7 @@ function initGraph(){
           try {
             if(defaultPlant[0].desired.max > yScale.domain()[1]) throw new Error('Max setpoint outside of Chart Y Axis boundries');
 
-            maxThreshold
+            maxLine
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
                 .y(function(d){ return yScale(d.desired.max); })
@@ -374,7 +391,7 @@ function initGraph(){
             maxText.text('Max');
           } catch (e) {
               if(e instanceof TypeError || e.message === 'Max setpoint outside of Chart Y Axis boundries'){
-                maxThreshold.attr('d', '');
+                maxLine.attr('d', '');
                 maxText.text('');
               } else {
                 console.log(e);
@@ -384,7 +401,7 @@ function initGraph(){
           try {
             if(defaultPlant[0].desired.min < yScale.domain()[0]) throw new Error('Min setpoint outside of Chart Y Axis boundries');
 
-            minThreshold
+            minLine
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
                 .y(function(d){ return yScale(d.desired.min); })
@@ -393,7 +410,7 @@ function initGraph(){
             minText.text('Min');
           } catch (e) {
             if(e instanceof TypeError || e.message === 'Min setpoint outside of Chart Y Axis boundries'){
-              minThreshold.attr('d', '');
+              minLine.attr('d', '');
               minText.text('');
             } else {
               console.log(e);
