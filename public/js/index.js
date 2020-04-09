@@ -277,7 +277,7 @@ function initGraph(){
   width = $(window).width()*0.8;
   padding = (50 / 650) * width;
 
-  if(svg) svg.remove();
+  if($('#graph').length) svg.remove();
 
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
@@ -295,6 +295,7 @@ function initGraph(){
         .attr('xmlns', 'http://www.w3.org/2000/svg');
 
     svg = d3.select('svg')
+              .attr('id','graph')
               .attr('width', width)
               .attr('height', height);
 
