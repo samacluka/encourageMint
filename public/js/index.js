@@ -24,7 +24,7 @@ var data;
 
 var isInitialized = false;
 
-function color(type){
+function getColour(type){
   switch(type) {
     case "temperature":
       return '#bf0000';
@@ -71,6 +71,23 @@ function getYLabel(type){
 
 function getTimeFormat(time){
   return ((time < 72) ? ('%H:%M') : ('%m/%d - %H:%M'));
+}
+
+function getSelection(){
+  var time = $('div.time-pills a.selected').data('time');
+  var plantid = $("select#plant-select option:selected").val();
+  var type = $('div.type-pills a.selected').data('type');
+  return [time, plantid, type];
+}
+
+function getData(period = 168){
+  var [time, plantid, type] = getSelection();
+  if(!plantid) return;
+
+  d3.json(`/data/log/${plantid}/${period}`, function(Data){
+    data = formatData(type, Data);
+    updateGraph()
+  });
 }
 
 function formatData(type, Data){
@@ -133,23 +150,6 @@ function setScales(time, type, Data){
               .range([padding, width - padding]);
 }
 
-function getSelection(){
-  var time = $('div.time-pills a.selected').data('time');
-  var plantid = $("select#plant-select option:selected").val();
-  var type = $('div.type-pills a.selected').data('type');
-  return [time, plantid, type];
-}
-
-function getData(period = 168){
-  var [time, plantid, type] = getSelection();
-  if(!plantid) return;
-
-  d3.json(`/data/log/${plantid}/${period}`, function(Data){
-    data = formatData(type, Data);
-    updateGraph()
-  });
-}
-
 function updateGraph(){
   if(!isInitialized){
     initGraph();
@@ -184,7 +184,7 @@ function updateGraph(){
       .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
         .transition()
         .duration(1000)
-        .attr('stroke', color(type))
+        .attr('stroke', getColour(type))
         .attr('d', d3.line()
           .x(function(d){ return xScale(d.created); })
           .y(function(d){ return yScale(d.desired); })
@@ -321,7 +321,7 @@ function initGraph(){
             .append('path')
             .datum(data.filter(d => d.created > new Date().getTime() - time * 60 * 60 * 1000))
               .attr('fill', 'none')
-              .attr('stroke', color(type))
+              .attr('stroke', getColour(type))
               .attr('stroke-width', lineWidth)
               .attr('d', d3.line()
                 .x(function(d){ return xScale(d.created); })
