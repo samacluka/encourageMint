@@ -25,7 +25,6 @@ var data;
 var isInitialized = false;
 
 function getColour(type){
-  console.log('getColour');
   switch(type) {
     case "temperature":
       return '#bf0000';
@@ -41,7 +40,6 @@ function getColour(type){
 }
 
 function getTitle(type){
-  console.log('getTitle');
   switch(type) {
     case "temperature":
       return 'Temperature vs. Time';
@@ -57,7 +55,6 @@ function getTitle(type){
 }
 
 function getYLabel(type){
-  console.log('getYLabel');
   switch(type) {
     case "temperature":
       return 'Temperature (°C)';
@@ -73,12 +70,10 @@ function getYLabel(type){
 }
 
 function getTimeFormat(time){
-  console.log('getTimeFormat');
   return ((time < 72) ? ('%H:%M') : ('%m/%d - %H:%M'));
 }
 
 function getSelection(){
-  console.log('getSelection');
   var time = $('div.time-pills a.selected').data('time');
   var plantid = $("select#plant-select option:selected").val();
   var type = $('div.type-pills a.selected').data('type');
@@ -86,7 +81,6 @@ function getSelection(){
 }
 
 function getData(period = 168){
-  console.log('getData');
   var [time, plantid, type] = getSelection();
   if(!plantid) return;
 
@@ -97,7 +91,6 @@ function getData(period = 168){
 }
 
 function formatData(type, Data){
-  console.log('formatData');
   if(!Data) return Data;
   Data.forEach(function(d,i){
     d.created = new Date(d.created).getTime();
@@ -110,7 +103,6 @@ function formatData(type, Data){
 }
 
 function formatDefaultData(type, time, [defaultPlant]){
-  console.log('formatDefaultData');
   // remove array wrapper in function def
   var now = new Date().getTime();
   var prev = now - parseInt(time) * 60 * 60 * 1000;
@@ -128,7 +120,6 @@ function formatDefaultData(type, time, [defaultPlant]){
 }
 
 function setScales(time, type, Data){
-  console.log('setScales');
   var now = new Date().getTime();
   var prev = now - parseInt(time) * 60 * 60 * 1000;
 
@@ -160,7 +151,6 @@ function setScales(time, type, Data){
 }
 
 function updateGraph(){
-  console.log('updateGraph');
   if(!isInitialized){
     initGraph();
     return;
@@ -283,7 +273,6 @@ function updateGraph(){
 }
 
 function initGraph(){
-  console.log('initGraph');
   height = $(window).height()*0.75;
   width = $(window).width()*0.8;
   padding = (50 / 650) * width;
@@ -450,7 +439,6 @@ function initGraph(){
 }
 
 function selectPill(event){
-  console.log('selectPill');
   event.preventDefault(); // Prevent scrolling up on data change
   $(`div.${event.data.str}-pills a.selected`).addClass('badge-light');
   $(`div.${event.data.str}-pills a.selected`).removeClass('badge-dark');
@@ -462,7 +450,6 @@ function selectPill(event){
 }
 
 function loadAlerts(){
-  console.log('loadAlerts');
   plantid = $('select#plant-select').val();
   if(!plantid) return;
   $.ajax({ type: "GET",
@@ -508,7 +495,6 @@ function loadAlerts(){
 }
 
 function registerButton(plantid = $('select#plant-select').val()){
-  console.log('registerButton');
   if(!plantid){
     throw new Error('No plant ID in main select');
     return
